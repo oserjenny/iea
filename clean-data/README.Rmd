@@ -569,6 +569,17 @@ write_delim(tbl, "output/clean_tbl.dat", delim = ",")
 ```
 
 
+To generate separate country-year .dat files, you can use the following code:
+
+```{r}
+tbl %>% 
+  mutate(country_year = paste0(COUNTRY, "-", ICCS_year)) %>% 
+  group_by(country_year) %>% 
+  group_walk(~ write_delim(.x, paste0("output/country-year/", .y$country_year, ".dat"), delim = ","))
+
+```
+
+
 ## Tables:
 
 Means of citizenship norm indicators by country and year.
