@@ -1,0 +1,818 @@
+---
+title: "Citizenship Norms 1999-2009-2016"
+author: "Jennifer Oser"
+date: "March, 2020"
+output: 
+  github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width = 10)
+```
+
+```{r}
+
+library(tidyverse)
+library(readr)
+library(purrr)
+library(writexl)
+
+```
+
+
+## Introduction
+This file documents the data cleaning for the IEA 1999-2009-2016 data
+
+For citizenship norm recodes in all three survey waves, the norms are coded in the descending mean order of the 1999 data: obey,rights,local,work,envir,vote,history,respect,news,protest,discuss,party
+
+
+## 1999 data loading and merging
+
+1999 data: https://doi.org/10.3886/ICPSR21661.v3 
+Downloaded Jan 17, 2019
+Title: IEA Civic Education Study, 1999: Civic Knowledge and Engagement Among 14-Year-Olds in 23 European Countries, 2 Latin American Countries, Hong Kong, Australia, and the United States (ICPSR 21661)
+
+Load 1999 country files, in chronological order of file names. Bind all 1999 files. Total observations of resulting tbl1 (93,882) concur with xls documentation of expected total n.
+
+
+```{r}
+
+# all files
+files <- list.files("../data", full.names = TRUE)
+
+# helper function to load files
+load_files <- function(file) {
+  e <- new.env()
+  load(file, envir = e)
+  
+  stopifnot(length(e) == 1)  # safety first
+  
+  get(names(e)[1], envir = e)
+}
+
+tbl1 <- files %>%
+  magrittr::extract(1:28) %>%      # filter to 1999 files only
+  map(~ .x %>%
+        load_files() %>%
+        select(COUNTRY, IDCNTRY, IDSTUD, BS3B1, BS3B11, BS3B9, BS3B4, BS3B13,
+               BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B12, BS3B3, GENDER,BSGBOOK, EXPEDUC, BSGEDUM, BSGEDUF, TOTWGT)) %>% 
+  reduce(rbind) %>% 
+  as_tibble() %>% 
+  mutate(`ICCS_year` = 1999) %>%     # add survey year variable
+  select(`ICCS_year`, everything())
+
+tbl1 <- tbl1 %>%
+	mutate_if(is.factor, fct_explicit_na)
+```
+
+
+View variables
+
+```{r, eval=FALSE}
+
+head(tbl1) %>% View
+```
+
+
+
+Cit norm, count all indicators to begin recode.
+
+```{r}
+
+original_vars <- tbl1 %>% 
+  select(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B12, BS3B3) %>% 
+  colnames() 
+
+original_vars %>% 
+  map(~ tbl1 %>% count(!!sym(.x))) 
+
+```
+
+
+Cit norm, count and recode 1st indicator as example.
+
+```{r}
+
+# recode
+tbl1 <- tbl1 %>% 
+  mutate(BS3B1_binary = fct_collapse(BS3B1, 
+  "not important" = c("(1) not important", "(2) somewhat unimportant"),
+  "important"     = c("(3) somewhat important", "(4) very important")))
+
+# confirm correct recode
+tbl1 %>%
+  count(BS3B1, BS3B1_binary) 
+```
+
+
+Repeat for all cit norm indicators. NOTE: BS3B12 recoded separately below b/c of typo in string variable.
+
+```{r}
+
+tbl1 <-tbl1 %>% 
+  mutate_at(vars(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B3),
+            funs(bin = fct_collapse(.,
+                                    "not important"= c("(1) not important", "(2) somewhat unimportant"),
+                                    "important"    = c("(3) somewhat important", "(4) very important")))
+  )
+```
+
+BS3B12 error troubleshoot when included in prior chunk. 
+Count table output shows that string text of 1st category "importnat"  spelled incorrectly, i.e. "a" and "n" transposed.
+BS3B12 "mutate" command to correctly recode with this typo:
+
+```{r}
+
+# troubleshoot
+tbl1 %>% count(BS3B12) 
+
+# recode
+tbl1 <- tbl1 %>% 
+  mutate(BS3B12_bin = fct_collapse(BS3B12, 
+                                   "not important" = c("(1) not importnat", "(2) somewhat unimportant"),
+                                   "important"     = c("(3) somewhat important", "(4) very important"))
+  )
+```
+
+Confirm successful mutates for all cit norms indicators.
+
+```{r}
+
+bin_vars <- original_vars %>% 
+  paste0("_bin")
+
+map2(original_vars, bin_vars, ~ tbl1 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Recode of individual-level control vars
+
+```{r}
+
+tbl1 <- tbl1 %>% 
+  mutate(female = ifelse(GENDER == "(0) Male", 0, 1),    # gender
+         books = case_when(                              # books in respondent's home
+           BSGBOOK == "(1) None"          ~ 0,
+           BSGBOOK == "(2) 1 - 10"        ~ 0,
+           BSGBOOK == "(3) 11 - 50"       ~ 1,
+           BSGBOOK == "(4) 51 - 100"      ~ 1,
+           BSGBOOK == "(5) 101 - 200"     ~ 2,
+           BSGBOOK == "(6) More than 200" ~ 3
+         ),
+         edexp = case_when(                              # expected number of additional educ years
+           EXPEDUC == "(0) 0"    ~ 0,
+           EXPEDUC == "(1) 1-2"  ~ 0,
+           EXPEDUC == "(2) 3-4"  ~ 0,
+           EXPEDUC == "(3) 5-6"  ~ 1,
+           EXPEDUC == "(4) 7-8"  ~ 1,
+           EXPEDUC == "(5) 9-10" ~ 2,
+           EXPEDUC == "(6) 10+"  ~ 2
+         ),
+         ed_mom = case_when(                             # mother education
+           BSGEDUM == "(1) no.elem.school"          ~ 0,
+           BSGEDUM == "(2) Fin. elem. sch."         ~ 0,
+           BSGEDUM == "(3) Fin.s.high sch."         ~ 0,
+           BSGEDUM == "(4) Fin.high sch."           ~ 1,
+           BSGEDUM == "(5) Sme technic.educ. after" ~ 2,
+           BSGEDUM == "(6) sme college,univ."       ~ 2,
+           BSGEDUM == "(7) bach. degree"            ~ 2
+         ),
+         ed_dad = case_when(                             # father education
+           BSGEDUF == "(1) No.elem.school"     ~ 0,
+           BSGEDUF == "(2) Fin. elem. sch."    ~ 0,
+           BSGEDUF == "(3) Fin.s.high sch."    ~ 0,
+           BSGEDUF == "(4) Fin.high sch."      ~ 1,
+           BSGEDUF == "(5) Sme techn.educ."    ~ 2,
+           BSGEDUF == "(6) Sme college, univ." ~ 2,
+           BSGEDUF == "(7) Bach. degree"       ~ 2
+         )) 
+
+# check recodes
+sociodem_vars <- c("GENDER", "BSGBOOK", "EXPEDUC", "BSGEDUM", "BSGEDUF")
+recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
+
+map2(recoded_vars, sociodem_vars, ~ tbl1 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Select for LCA vars tibble, including rename all mutated variables and display first five lines of dataframe.
+
+```{r}
+
+tbl1 <- tbl1 %>%
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         TOTWGTS = TOTWGT,
+         obey    = BS3B1_bin,
+         rights  = BS3B11_bin,
+         local   = BS3B9_bin,
+         work    = BS3B4_bin,
+         envir   = BS3B13_bin,
+         vote    = BS3B2_bin,
+         history = BS3B6_bin,
+         respect = BS3B10_bin,
+         news    = BS3B8_bin,
+         protest = BS3B5_bin,
+         discuss = BS3B12_bin,
+         party   = BS3B3_bin,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad)
+
+tbl1 %>% head()
+```
+
+
+## 2009 dataloading and merging
+
+2009 data: https://doi.org/10.3886/ICPSR36997.v2
+Downloaded Jan 17, 2019
+Title: International Civic and Citizenship Education Study, 2009 (ICPSR 36997)
+
+Load 2009 country files, in chronological order of file names. Bind all 2009 files. Note, total observations of resulting tbl2 (140,650) concur with xls documentation of expected total n.
+
+```{r}
+
+tbl2 <- files %>%
+  magrittr::extract(29:66) %>%      # filter to 2009 files only
+  map(~ .x %>%
+        load_files() %>%
+        select(COUNTRY, IDCNTRY, IDSTUD, IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A,
+               IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B, SGENDER, IS2G11, IS2G03, IS2G07, IS2G09, TOTWGTS)) %>% 
+  reduce(rbind) %>% 
+  as_tibble() %>% 
+  mutate(`ICCS_year` = 2009) %>%     # survey year variable creation
+  select(`ICCS_year`, everything())
+```
+
+Cit norm, count all indicators to begin recode.
+
+```{r}
+
+original_vars <- tbl2 %>% 
+  select(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B) %>% 
+  colnames() 
+
+original_vars %>% 
+  map(~ tbl2 %>% count(!!sym(.x)))
+```
+
+Recode all cit norm indicators. 
+
+```{r}
+
+tbl2 <- tbl2 %>% 
+  mutate_at(vars(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B),
+            funs(bin = fct_collapse(.,
+                                    "not important" = c("(3) NOT VERY IMPORTANT", "(4) NOT IMPORTANT AT ALL"),
+                                    "important"     = c("(1) VERY IMPORTANT", "(2) QUITE IMPORTANT")))
+  )
+```
+
+Confirm successful recodes.
+
+```{r}
+
+bin_vars <- original_vars %>% 
+  paste0("_bin")
+
+map2(original_vars, bin_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Recode of individual-level control vars
+
+```{r}
+
+tbl2 <- tbl2 %>% 
+  mutate(female = ifelse(SGENDER == "(0) BOY", 0, 1),    # gender
+         books = case_when(                              # books in respondent's home
+           IS2G11 == "(1) 0-10 BOOKS"          ~ 0,
+           IS2G11 == "(2) 11-25 BOOKS"         ~ 1,
+           IS2G11 == "(3) 26-100 BOOKS"        ~ 1,
+           IS2G11 == "(4) 101-200 BOOKS"       ~ 2,
+           IS2G11 == "(5) 201-500 BOOKS"       ~ 3,
+           IS2G11 == "(6) MORE THAN 500 BOOKS" ~ 3
+         ),
+         edexp = case_when(                              # expected number of additional educ years
+           IS2G03 == "(1) <ISCED 5A OR 6>"      ~ 2,
+           IS2G03 == "(2) <ISCED 4 OR 5B>"      ~ 2,
+           IS2G03 == "(3) <ISCED 3>"            ~ 1,
+           IS2G03 == "(4) <ISCED 2>"            ~ 0,
+           IS2G03 == "(5) NOT EXPECT <ISCED 2>" ~ 0
+         ),
+         ed_mom = case_when(                             # mother education
+           IS2G07 == "(1) <ISCED 5A OR 6>"            ~ 2,
+           IS2G07 == "(2) <ISCED 4 OR 5B>"            ~ 2,
+           IS2G07 == "(3) <ISCED 3>"                  ~ 1,
+           IS2G07 == "(4) <ISCED 2>"                  ~ 0,
+           IS2G07 == "(5) <ISCED 1>"                  ~ 0,
+           IS2G07 == "(6) DID NOT COMPLETE <ISCED 1>" ~ 0
+         ),
+         ed_dad = case_when(                             # father education
+           IS2G09 == "(1) <ISCED 5A OR 6>"            ~ 2,
+           IS2G09 == "(2) <ISCED 4 OR 5B>"            ~ 2,
+           IS2G09 == "(3) <ISCED 3>"                  ~ 1,
+           IS2G09 == "(4) <ISCED 2>"                  ~ 0,
+           IS2G09 == "(5) <ISCED 1>"                  ~ 0,
+           IS2G09 == "(6) DID NOT COMPLETE <ISCED 1>" ~ 0
+         )) 
+
+# check recodes
+sociodem_vars <- c("SGENDER", "IS2G11", "IS2G03", "IS2G07", "IS2G09")
+recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
+
+map2(recoded_vars, sociodem_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+
+View variables
+
+```{r, eval=FALSE}
+
+head(tbl2) %>% View
+```
+
+
+Select for LCA vars tibble, including rename all mutated variables and display first five lines of dataframe.
+
+```{r}
+
+tbl2 <- tbl2 %>%
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         TOTWGTS,
+         obey    = IS2P21L_bin,
+         rights  = IS2P21I_bin,
+         local   = IS2P21H_bin,
+         work    = IS2P21K_bin,
+         envir   = IS2P21J_bin,
+         vote    = IS2P21A_bin,
+         history = IS2P21C_bin,
+         respect = IS2P21E_bin,
+         news    = IS2P21D_bin,
+         protest = IS2P21G_bin,
+         discuss = IS2P21F_bin,
+         party   = IS2P21B_bin,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad) 
+
+tbl2 %>% head()
+```
+
+
+## 2016 data loading and merging
+
+2016 data: https://doi.org/10.3886/ICPSR37147.v1  
+Downloaded Jan 21, 2019
+Title: International Civic and Citizenship Education Study, 2016 (ICPSR 37147)
+
+2016 country files, in chronological order of file names. Bind all 2016 country files. Note, total observations of resulting tbl (94,603) concur with xls documentation of expected total n.
+
+```{r}
+
+tbl3 <- files %>%
+  magrittr::extract(67:90) %>%      # filter to 2016 files only
+  map(~ .x %>%
+        load_files() %>%
+        select(COUNTRY, IDCNTRY, IDSTUD, IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J,
+               IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B, S_GENDER, IS3G11, IS3G03, IS3G07, IS3G09, TOTWGTS)) %>% 
+  reduce(rbind) %>% 
+  as_tibble()%>% 
+  mutate(`ICCS_year` = 2016) %>%    # create survey year variable
+  select(`ICCS_year`, everything())
+```
+
+Cit norm, count all indicators to begin recode.
+
+```{r}
+
+original_vars <- tbl3 %>% 
+  select(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B) %>% 
+  colnames() 
+
+original_vars %>% 
+  map(~ tbl3 %>% count(!!sym(.x)))
+```
+
+
+Recode all cit norm indicators. 
+
+```{r}
+
+tbl3 <- tbl3 %>% 
+  mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
+            funs(bin = fct_collapse(.,
+                                    "not important" = c("(3) Not very important", "(4) Not important at all"),
+                                    "important"     = c("(1) Very important", "(2) Quite important")))
+  )
+```
+
+Confirm successful mutates.
+
+```{r}
+
+bin_vars <- original_vars %>% 
+  paste0("_bin")
+
+map2(original_vars, bin_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Recode of individual-level control vars
+
+```{r}
+
+tbl3 <- tbl3 %>% 
+  mutate(female = ifelse(S_GENDER == "(0) BOY", 0, 1),   # gender
+         books = case_when(                              # books in respondent's home
+           IS3G11 == "(1) None or very few (0–10 books)"                                ~ 0,
+           IS3G11 == "(2) Enough to fill one shelf (11–25 books)"                       ~ 1,
+           IS3G11 == "(3) Enough to fill one bookcase (26–100 books)"                   ~ 1,
+           IS3G11 == "(4) Enough to fill two bookcase (101–200 books)"                  ~ 2,
+           IS3G11 == "(5) Enough to fill three or more bookcases (more than 200 books)" ~ 3
+         ),
+         edexp = case_when(                              # expected number of additional educ years
+           IS3G03 == "(1) <ISCED level 6, 7 or 8>"   ~ 2,
+           IS3G03 == "(2) <ISCED level 4 or 5>"      ~ 2,
+           IS3G03 == "(3) <ISCED level 3>"           ~ 1,
+           IS3G03 == "(4) <ISCED level 2> or below" ~ 0
+         ),
+         ed_mom = case_when(                             # mother education
+           IS3G07 == "(1) <ISCED level 6, 7 or 8>"              ~ 2,
+           IS3G07 == "(2) <ISCED level 4 or 5>"                 ~ 2,
+           IS3G07 == "(3) <ISCED level 3>"                      ~ 1,
+           IS3G07 == "(4) <ISCED level 2>"                      ~ 0,
+           IS3G07 == "(5) She did not complete <ISCED level 2>" ~ 0
+         ),
+         ed_dad = case_when(                             # father education
+           IS3G09 == "(1) <ISCED level 6, 7 or 8>"             ~ 2,
+           IS3G09 == "(2) <ISCED level 4 or 5>"                ~ 2,
+           IS3G09 == "(3) <ISCED level 3>"                     ~ 1,
+           IS3G09 == "(4) <ISCED level 2>"                     ~ 0,
+           IS3G09 == "(5) He did not complete <ISCED level 2>" ~ 0
+         )) 
+
+# check recodes
+sociodem_vars <- c("S_GENDER", "IS3G11", "IS3G03", "IS3G07", "IS3G09")
+recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
+
+map2(recoded_vars, sociodem_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Select for LCA vars tibble, including rename all mutated variables and display first five lines of dataframe.
+
+```{r}
+
+tbl3 <- tbl3 %>% 
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         TOTWGTS,
+         obey    = IS3G23L_bin,
+         rights  = IS3G23I_bin,
+         local   = IS3G23H_bin,
+         work    = IS3G23K_bin,
+         envir   = IS3G23J_bin,
+         vote    = IS3G23A_bin,
+         history = IS3G23C_bin,
+         respect = IS3G23E_bin,
+         news    = IS3G23D_bin,
+         protest = IS3G23G_bin,
+         discuss = IS3G23F_bin,
+         party   = IS3G23B_bin,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad)
+
+tbl3 %>% head()
+```
+
+
+## Combining recoded 1999, 2009 and 2016 data frames 
+
+Combine the three data frames and create unique id per observation across binded country files to be able to import Latent Gold class assignment for each unique observation.
+
+```{r}
+
+tbl <- rbind(tbl1, tbl2, tbl3) %>% 
+  mutate(id  = row_number(),
+         id2 = paste0(COUNTRY, IDSTUD))
+```
+
+Check number of observations by survey year of the combined data frame.
+```{r}
+
+# number of observations by survey year
+tbl %>% 
+  count(ICCS_year) %>% 
+  knitr::kable()
+```
+
+
+## Exporting final combined datafile
+
+Before exporting, convert citizenship norm indicators to integer (0 = "not important", 1 = "important").
+
+```{r}
+
+cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
+
+tbl <- tbl %>% 
+  mutate_at(cit_norm_indicators,
+            funs(case_when(
+              . == "not important" ~ 0L,
+              . == "important"     ~ 1L,
+              TRUE~NA_integer_
+            ))
+  ) %>% 
+  mutate_at(vars(ICCS_year), as.integer) %>% 
+  mutate(COUNTRY = as.character(COUNTRY))
+
+tbl %>% head()
+```
+
+
+Attach factor labels to the citizenship norm indicators for internal use in R (but without exporting the factor labels to the output ".dat"" file for Latent Gold LCA analysis). 
+
+```{r}
+
+example <- tbl %>% 
+  mutate_at(cit_norm_indicators,
+            funs(haven::labelled(., labels = c("not important" = 0, "important" = 1))))
+
+# cit norm indicator vars are now int+lbl type
+example %>% 
+  glimpse()
+
+# access labels by converting those vars to factors
+example %>% 
+  mutate_at(cit_norm_indicators, funs(as_factor(.)))
+```
+
+
+
+Export recoded data for LCA 
+`ICCS-2019/clean-data` directory.
+
+```{r}
+
+write_delim(tbl, "output/clean_tbl.dat", delim = ",")
+
+```
+
+
+## Tables:
+
+Means of citizenship norm indicators by country and year.
+
+```{r}
+
+# count and percent of responses to "obey" grouped by year
+means <- tbl %>%
+  group_by(COUNTRY, ICCS_year) %>% 
+  summarize_at(cit_norm_indicators, funs(round(mean(., na.rm = TRUE), 3)))
+
+means %>% 
+  knitr::kable()
+```
+
+Count and percentage of missing values for each indicator by country and year.
+
+```{r}
+
+missing <- tbl %>% 
+  group_by(COUNTRY, ICCS_year) %>% 
+  summarize_at(cit_norm_indicators,
+               funs(paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
+
+missing %>% 
+  knitr::kable()
+```
+
+
+Write to excel: cit noms means and missings tables.
+
+```{r}
+
+write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indicator-tables.xlsx")
+```
+
+
+## Figures:
+
+#### Means for twelve citizenship norm indicators for only the 14 countries that are included in all three waves of the survey.
+
+First, create the table to be used for plotting.
+
+```{r, warning = FALSE}
+all_wave_countries <- tbl %>%
+  count(COUNTRY, ICCS_year) %>% 
+  count(COUNTRY) %>%
+  filter(nn == 3) %>% 
+  pull(COUNTRY)
+
+# table with lower and upper limits for error bars
+plot_tbl <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries) %>% 
+  group_by(ICCS_year) %>% 
+  summarize_at(cit_norm_indicators, funs(t.test(.) %>%
+                                           broom::tidy() %>%
+                                           mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
+                                           pull(mean_ci))) %>% 
+  gather(Indicator, value, -ICCS_year) %>% 
+  mutate(value = str_split(value, " "),
+         cols = map(value, ~ data.frame(t(.)))) %>% 
+  unnest(cols) %>% 
+  select(-value) %>% 
+  mutate(mean  = as.numeric(X1),
+         lower = as.numeric(X2),
+         upper = as.numeric(X3)) %>% 
+  select(-c(X1, X2, X3))
+
+plot_tbl %>% 
+  mutate_if(is.numeric, round, 3) %>% 
+  knitr::kable()
+
+```
+
+
+
+Line plots:
+
+```{r line-plots-all}
+
+# line plot with year on x-axis, lines colored by indicator type
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .3) +
+  geom_line() +
+  geom_point() +
+  lims(y = c(0, 1)) +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") 
+
+ggsave("output/mean-citizenship-norm-line-plot-by-year.png")
+```
+
+Black and white: add the `theme_bw()` option at the end, and change the "color" aesthetic to `lty` to give a different line type for each `Indicator`.
+
+```{r}
+
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, lty = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .3) +
+  geom_line() +
+  geom_point() +
+  lims(y = c(0, 1)) +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") +
+  theme_bw()
+
+```
+
+Alternate representation of same data: plot indicators separately and `facet_wrap()` the plots so they are all in one image. Advantage to this representation is that allows readability of confidence intervals for each individual indicator.
+
+```{r line-plots-facet-1}
+# line plot with year on x-axis, lines colored by indicator type
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Indicator, scales = "free") +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") +
+  theme(legend.position = "none")
+
+ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+```
+
+
+Facet wrap with improved interpretability, including consistent y-axis, and re-ordering to highest mean top left
+
+```{r line-plots-facet-4}
+# line plot with year on x-axis, lines colored by indicator type
+barplot_tbl<- plot_tbl %>% 
+    mutate(Indicator=fct_relevel(Indicator,c("obey", "rights", "local", "work", "envir", "vote", "history", "respect", "news", "protest", "discuss", "party"))) 
+
+barplot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Indicator, scales = "fixed") +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year", caption = paste("n =",nrow(barplot_tbl))) +
+  theme(legend.position = "none", axis.text.x = element_text(size=7)) +
+  scale_x_continuous(breaks=c(1999, 2009, 2016))
+
+ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+```
+
+
+Bar plots:
+
+```{r}
+
+# bar plot with indicators on x-axis, lines colored by year
+plot_tbl %>% 
+  mutate(Year      = as.factor(ICCS_year),
+         Indicator = factor(Indicator, ordered = TRUE, levels = c("obey", "rights", "local", "work", "envir", "vote", "history",
+                                                                  "respect", "news", "protest", "discuss", "party"))) %>% 
+  ggplot(aes(x = Indicator, y = mean, fill = Year)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5, position = position_dodge(.9)) +
+  labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year")
+
+ggsave("output/mean-citizenship-norm-bar-plot-by-indicator.png")
+```
+
+
+Bar plots of 14 countries in all 3 time periods, black and white:
+
+```{r}
+# bar plot with indicators on x-axis, lines colored by year
+plot_tbl %>% 
+  mutate(Year      = as.factor(ICCS_year),
+         Indicator = factor(Indicator, ordered = TRUE, levels = c("obey", "rights", "local", "work", "envir", "vote", "history",
+                                                                  "respect", "news", "protest", "discuss", "party"))) %>% 
+  ggplot(aes(x = Indicator, y = mean, fill = Year)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5, position = position_dodge(.9)) +
+  labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year, 14 countries") +
+  theme_bw() + scale_fill_grey()
+
+ggsave("output/14cntry-mean-citizenship-norm-bar-plot-by-indicator-bw.png")
+```
+
+
+
+
+Export tbl to stata to add to replication files
+
+```{r}
+# Select for countries in all 3 waves only
+
+all_wave_countries <- tbl %>%
+  count(COUNTRY, ICCS_year) %>% 
+  count(COUNTRY) %>%
+  filter(nn == 3) %>% 
+  pull(COUNTRY)
+
+all_wave_countries %>% head()
+```
+
+```{r}
+# Filter by countries in all 3 waves
+
+stata_tbl <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries)
+
+
+stata_tbl %>% head()
+```
+
+```{r}
+stata_tbl14 <- stata_tbl %>%
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         id,
+         id2,
+         TOTWGTS,
+         obey,
+         rights,
+         local,
+         work,
+         envir,
+         vote,
+         history,
+         respect,
+         news,
+         protest,
+         discuss,
+         party,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad)
+         
+stata_tbl14 %>% head()
+
+```
+
+
+```{r}
+
+haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
+
+```
+
+
+
+
