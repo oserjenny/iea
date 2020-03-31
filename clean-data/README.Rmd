@@ -569,7 +569,7 @@ write_delim(tbl, "output/clean_tbl.dat", delim = ",")
 ```
 
 
-To generate separate country-year .dat files, you can use the following code:
+Generate separate country-year .dat files:
 
 ```{r}
 tbl %>% 
