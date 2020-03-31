@@ -627,7 +627,7 @@ First, create the table to be used for plotting.
 all_wave_countries <- tbl %>%
   count(COUNTRY, ICCS_year) %>% 
   count(COUNTRY) %>%
-  filter(nn == 3) %>% 
+  filter(n == 3) %>% 
   pull(COUNTRY)
 
 # table with lower and upper limits for error bars
