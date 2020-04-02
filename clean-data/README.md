@@ -7,14 +7,20 @@ March, 2020
 library(tidyverse)
 ```
 
-    ## -- Attaching packages --------------------- tidyverse 1.3.0 --
+    ## Registered S3 methods overwritten by 'ggplot2':
+    ##   method         from 
+    ##   [.quosures     rlang
+    ##   c.quosures     rlang
+    ##   print.quosures rlang
 
-    ## v ggplot2 3.3.0     v purrr   0.3.3
-    ## v tibble  2.1.3     v dplyr   0.8.5
-    ## v tidyr   1.0.2     v stringr 1.4.0
-    ## v readr   1.3.1     v forcats 0.5.0
+    ## ── Attaching packages ─────────────────────── tidyverse 1.2.1 ──
 
-    ## -- Conflicts ------------------------ tidyverse_conflicts() --
+    ## ✓ ggplot2 3.1.1     ✓ purrr   0.3.3
+    ## ✓ tibble  2.1.3     ✓ dplyr   0.8.4
+    ## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+    ## ✓ readr   1.3.1     ✓ forcats 0.4.0
+
+    ## ── Conflicts ────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -259,7 +265,7 @@ tbl1 <-tbl1 %>%
 
 BS3B12 error troubleshoot when included in prior chunk. Count table
 output shows that string text of 1st category “importnat” spelled
-incorrectly, i.e. “a” and “n” transposed. BS3B12 “mutate” command to
+incorrectly, i.e. “a” and “n” transposed. BS3B12 “mutate” command to
 correctly recode with this typo:
 
 ``` r
@@ -552,17 +558,17 @@ tbl1 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      1999 AUS      10302    57.2 impo~ not i~ impo~ impo~ impo~ impo~ import~
-    ## 2      1999 AUS      10305    57.2 impo~ not i~ impo~ impo~ impo~ impo~ not im~
-    ## 3      1999 AUS      10311    57.2 impo~ (Miss~ (Mis~ impo~ impo~ not ~ not im~
-    ## 4      1999 AUS      10313    57.2 impo~ not i~ not ~ not ~ not ~ impo~ not im~
-    ## 5      1999 AUS      10317    57.2 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ## 6      1999 AUS      10319    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      1999 AUS      10302    57.2 impo… not i… impo… impo… impo… impo…
+    ## 2      1999 AUS      10305    57.2 impo… not i… impo… impo… impo… impo…
+    ## 3      1999 AUS      10311    57.2 impo… (Miss… (Mis… impo… impo… not …
+    ## 4      1999 AUS      10313    57.2 impo… not i… not … not … not … impo…
+    ## 5      1999 AUS      10317    57.2 impo… impor… impo… not … impo… not …
+    ## 6      1999 AUS      10319    57.2 impo… impor… impo… impo… impo… impo…
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## 2009 dataloading and merging
 
@@ -1117,17 +1123,17 @@ tbl2 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      2009 AUT     1.00e7    26.6 not ~ impor~ impo~ not ~ impo~ impo~ not im~
-    ## 2      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ## 3      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 4      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ not ~ impo~ impo~ import~
-    ## 5      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 6      2009 AUT     1.00e7    26.6 impo~ impor~ not ~ impo~ impo~ impo~ import~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      2009 AUT     1.00e7    26.6 not … impor… impo… not … impo… impo…
+    ## 2      2009 AUT     1.00e7    26.6 impo… impor… impo… not … impo… not …
+    ## 3      2009 AUT     1.00e7    26.6 impo… impor… impo… impo… impo… impo…
+    ## 4      2009 AUT     1.00e7    26.6 impo… impor… impo… not … impo… impo…
+    ## 5      2009 AUT     1.00e7    26.6 impo… impor… impo… impo… impo… impo…
+    ## 6      2009 AUT     1.00e7    26.6 impo… impor… not … impo… impo… impo…
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## 2016 data loading and merging
 
@@ -1596,14 +1602,14 @@ map2(recoded_vars, sociodem_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
     ## 
     ## [[2]]
     ## # A tibble: 6 x 3
-    ##   books IS3G11                                                               n
-    ##   <dbl> <fct>                                                            <int>
-    ## 1     0 (1) None or very few (0–10 books)                                14514
-    ## 2     1 (2) Enough to fill one shelf (11–25 books)                       22778
-    ## 3     1 (3) Enough to fill one bookcase (26–100 books)                   29001
-    ## 4     2 (4) Enough to fill two bookcase (101–200 books)                  14512
-    ## 5     3 (5) Enough to fill three or more bookcases (more than 200 books) 12648
-    ## 6    NA <NA>                                                              1150
+    ##   books IS3G11                                                            n
+    ##   <dbl> <fct>                                                         <int>
+    ## 1     0 (1) None or very few (0–10 books)                             14514
+    ## 2     1 (2) Enough to fill one shelf (11–25 books)                    22778
+    ## 3     1 (3) Enough to fill one bookcase (26–100 books)                29001
+    ## 4     2 (4) Enough to fill two bookcase (101–200 books)               14512
+    ## 5     3 (5) Enough to fill three or more bookcases (more than 200 bo… 12648
+    ## 6    NA <NA>                                                           1150
     ## 
     ## [[3]]
     ## # A tibble: 5 x 3
@@ -1668,17 +1674,17 @@ tbl3 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 2      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 3      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 4      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 5      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 6      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ not ~ not im~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 2      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 3      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 4      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 5      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 6      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… not …
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## Combining recoded 1999, 2009 and 2016 data frames
 
@@ -1710,7 +1716,8 @@ tbl %>%
 ## Exporting final combined datafile
 
 Before exporting, convert citizenship norm indicators to integer (0 =
-“not important”, 1 = “important”).
+“not important”, 1 =
+“important”).
 
 ``` r
 cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
@@ -1730,17 +1737,17 @@ tbl %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
-    ## 2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
-    ## 3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
-    ## 4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
-    ## 5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
-    ## 6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 AUS      10302    57.2     1      0     1     1     1     1
+    ## 2      1999 AUS      10305    57.2     1      0     1     1     1     1
+    ## 3      1999 AUS      10311    57.2     1     NA    NA     1     1     0
+    ## 4      1999 AUS      10313    57.2     1      0     0     0     0     1
+    ## 5      1999 AUS      10317    57.2     1      1     1     0     1     0
+    ## 6      1999 AUS      10319    57.2     1      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 Attach factor labels to the citizenship norm indicators for internal use
 in R (but without exporting the factor labels to the output “.dat”" file
@@ -1758,29 +1765,29 @@ example %>%
 
     ## Observations: 329,135
     ## Variables: 23
-    ## $ ICCS_year <int> 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 199...
-    ## $ COUNTRY   <chr> "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "...
-    ## $ IDSTUD    <dbl> 10302, 10305, 10311, 10313, 10317, 10319, 10324, 10325, 1...
-    ## $ TOTWGTS   <dbl> 57.18350, 57.18350, 57.18350, 57.18350, 57.18350, 57.1835...
-    ## $ obey      <int+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-    ## $ rights    <int+lbl> 0, 0, NA, 0, 1, 1, 1, NA, 1, 1, 1, 1, 1, 1, 1, 1, 0, ...
-    ## $ local     <int+lbl> 1, 1, NA, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
-    ## $ work      <int+lbl> 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,...
-    ## $ envir     <int+lbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,...
-    ## $ vote      <int+lbl> 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1,...
-    ## $ history   <int+lbl> 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1,...
-    ## $ respect   <int+lbl> 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0,...
-    ## $ news      <int+lbl> 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1,...
-    ## $ protest   <int+lbl> 0, 1, NA, 0, 1, 1, 0, NA, 1, 0, 1, 1, 1, 1, 1, 1, 0, ...
-    ## $ discuss   <int+lbl> 0, 0, NA, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1...
-    ## $ party     <int+lbl> 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-    ## $ female    <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-    ## $ books     <dbl> 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 3, 3, 1, 0, 2, 2, 3, ...
-    ## $ edexp     <dbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 0, 0, 1, 1, ...
-    ## $ ed_mom    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, 2, 2, 2, 2, 0, 2, 2, 2,...
-    ## $ ed_dad    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, NA, 2, 2, 2, 2, 2, 2, 2...
-    ## $ id        <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17...
-    ## $ id2       <chr> "AUS10302", "AUS10305", "AUS10311", "AUS10313", "AUS10317...
+    ## $ ICCS_year <int> 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, …
+    ## $ COUNTRY   <chr> "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS"…
+    ## $ IDSTUD    <dbl> 10302, 10305, 10311, 10313, 10317, 10319, 10324, 10325…
+    ## $ TOTWGTS   <dbl> 57.18350, 57.18350, 57.18350, 57.18350, 57.18350, 57.1…
+    ## $ obey      <int+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+    ## $ rights    <int+lbl> 0, 0, NA, 0, 1, 1, 1, NA, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ local     <int+lbl> 1, 1, NA, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+    ## $ work      <int+lbl> 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,…
+    ## $ envir     <int+lbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,…
+    ## $ vote      <int+lbl> 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ history   <int+lbl> 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ respect   <int+lbl> 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ news      <int+lbl> 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1,…
+    ## $ protest   <int+lbl> 0, 1, NA, 0, 1, 1, 0, NA, 1, 0, 1, 1, 1, 1, 1, 1, …
+    ## $ discuss   <int+lbl> 0, 0, NA, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0…
+    ## $ party     <int+lbl> 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ female    <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ books     <dbl> 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 3, 3, 1, 0, 2, 2, …
+    ## $ edexp     <dbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 0, 0, 1, …
+    ## $ ed_mom    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, 2, 2, 2, 2, 0, 2, 2,…
+    ## $ ed_dad    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, NA, 2, 2, 2, 2, 2, 2…
+    ## $ id        <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,…
+    ## $ id2       <chr> "AUS10302", "AUS10305", "AUS10311", "AUS10313", "AUS10…
 
 ``` r
 # access labels by converting those vars to factors
@@ -1789,21 +1796,22 @@ example %>%
 ```
 
     ## # A tibble: 329,135 x 23
-    ##    ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##        <int> <chr>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ##  1      1999 AUS      10302    57.2 impo~ not i~ impo~ impo~ impo~ impo~ import~
-    ##  2      1999 AUS      10305    57.2 impo~ not i~ impo~ impo~ impo~ impo~ not im~
-    ##  3      1999 AUS      10311    57.2 impo~ <NA>   <NA>  impo~ impo~ not ~ not im~
-    ##  4      1999 AUS      10313    57.2 impo~ not i~ not ~ not ~ not ~ impo~ not im~
-    ##  5      1999 AUS      10317    57.2 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ##  6      1999 AUS      10319    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ##  7      1999 AUS      10324    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ##  8      1999 AUS      10325    57.2 impo~ <NA>   impo~ impo~ impo~ impo~ import~
-    ##  9      1999 AUS      10326    57.2 impo~ impor~ impo~ impo~ impo~ not ~ not im~
-    ## 10      1999 AUS      10327    57.2 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## # ... with 329,125 more rows, and 12 more variables: respect <fct>, news <fct>,
-    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
-    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##    ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##        <int> <chr>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ##  1      1999 AUS      10302    57.2 impo… not i… impo… impo… impo… impo…
+    ##  2      1999 AUS      10305    57.2 impo… not i… impo… impo… impo… impo…
+    ##  3      1999 AUS      10311    57.2 impo… <NA>   <NA>  impo… impo… not …
+    ##  4      1999 AUS      10313    57.2 impo… not i… not … not … not … impo…
+    ##  5      1999 AUS      10317    57.2 impo… impor… impo… not … impo… not …
+    ##  6      1999 AUS      10319    57.2 impo… impor… impo… impo… impo… impo…
+    ##  7      1999 AUS      10324    57.2 impo… impor… impo… impo… impo… impo…
+    ##  8      1999 AUS      10325    57.2 impo… <NA>   impo… impo… impo… impo…
+    ##  9      1999 AUS      10326    57.2 impo… impor… impo… impo… impo… not …
+    ## 10      1999 AUS      10327    57.2 impo… impor… impo… impo… impo… impo…
+    ## # … with 329,125 more rows, and 13 more variables: history <fct>,
+    ## #   respect <fct>, news <fct>, protest <fct>, discuss <fct>, party <fct>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>,
+    ## #   id <int>, id2 <chr>
 
 Export recoded data for LCA `ICCS-2019/clean-data` directory.
 
@@ -1822,22 +1830,22 @@ tbl %>%
 
     ## # A tibble: 329,135 x 24
     ## # Groups:   country_year [90]
-    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
-    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
-    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
-    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
-    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
-    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
-    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1       0
-    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1       1
-    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0       0
-    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1       1
-    ## # ... with 329,125 more rows, and 13 more variables: respect <int>, news <int>,
-    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
-    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>,
-    ## #   country_year <chr>
+    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1
+    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1
+    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0
+    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1
+    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0
+    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1
+    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1
+    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1
+    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0
+    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1
+    ## # … with 329,125 more rows, and 14 more variables: history <int>,
+    ## #   respect <int>, news <int>, protest <int>, discuss <int>, party <int>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>,
+    ## #   id <int>, id2 <chr>, country_year <chr>
 
 ## Tables:
 
@@ -2052,7 +2060,8 @@ missing %>%
 | TWN     |       2016 | 11 (0.28%)   | 11 (0.28%)   | 10 (0.25%)   | 11 (0.28%)   | 12 (0.3%)    | 10 (0.25%)  | 17 (0.43%)   | 12 (0.3%)    | 10 (0.25%)   | 16 (0.4%)    | 13 (0.33%)   | 13 (0.33%)   |
 | USA     |       1999 | 98 (3.49%)   | 209 (7.44%)  | 141 (5.02%)  | 131 (4.66%)  | 186 (6.62%)  | 123 (4.38%) | 158 (5.62%)  | 162 (5.76%)  | 193 (6.87%)  | 355 (12.63%) | 307 (10.92%) | 259 (9.21%)  |
 
-Write to excel: cit noms means and missings tables.
+Write to excel: cit noms means and missings
+tables.
 
 ``` r
 write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indicator-tables.xlsx")
@@ -2084,9 +2093,9 @@ plot_tbl <- tbl %>%
          cols = map(value, ~ data.frame(t(.)))) %>% 
   unnest(cols) %>% 
   select(-value) %>% 
-  mutate(mean  = as.numeric(X1),
-         lower = as.numeric(X2),
-         upper = as.numeric(X3)) %>% 
+  mutate(mean  = as.numeric(as.character(X1)),
+         lower = as.numeric(as.character(X2)),
+         upper = as.numeric(as.character(X3))) %>% 
   select(-c(X1, X2, X3))
 
 plot_tbl %>% 
@@ -2094,44 +2103,44 @@ plot_tbl %>%
   knitr::kable()
 ```
 
-| ICCS\_year | Indicator | mean | lower | upper |
-| ---------: | :-------- | ---: | ----: | ----: |
-|       1999 | obey      |    1 |     1 |     1 |
-|       2009 | obey      |    2 |     2 |     2 |
-|       2016 | obey      |    3 |     3 |     3 |
-|       1999 | rights    |    4 |     4 |     4 |
-|       2009 | rights    |    5 |     5 |     5 |
-|       2016 | rights    |    6 |     6 |     6 |
-|       1999 | local     |    7 |     7 |     7 |
-|       2009 | local     |    8 |     8 |     8 |
-|       2016 | local     |    9 |     9 |     9 |
-|       1999 | work      |   10 |    10 |    10 |
-|       2009 | work      |   11 |    11 |    11 |
-|       2016 | work      |   12 |    12 |    12 |
-|       1999 | envir     |   13 |    13 |    13 |
-|       2009 | envir     |   14 |    14 |    14 |
-|       2016 | envir     |   15 |    15 |    15 |
-|       1999 | vote      |   16 |    16 |    16 |
-|       2009 | vote      |   17 |    17 |    17 |
-|       2016 | vote      |   18 |    18 |    18 |
-|       1999 | history   |   19 |    19 |    19 |
-|       2009 | history   |   20 |    20 |    20 |
-|       2016 | history   |   21 |    21 |    21 |
-|       1999 | respect   |   22 |    22 |    22 |
-|       2009 | respect   |   23 |    23 |    23 |
-|       2016 | respect   |   24 |    24 |    24 |
-|       1999 | news      |   25 |    25 |    25 |
-|       2009 | news      |   26 |    26 |    26 |
-|       2016 | news      |   27 |    27 |    27 |
-|       1999 | protest   |   28 |    28 |    28 |
-|       2009 | protest   |   29 |    29 |    29 |
-|       2016 | protest   |   30 |    30 |    30 |
-|       1999 | discuss   |   31 |    31 |    31 |
-|       2009 | discuss   |   32 |    32 |    32 |
-|       2016 | discuss   |   33 |    33 |    33 |
-|       1999 | party     |   34 |    34 |    34 |
-|       2009 | party     |   35 |    35 |    35 |
-|       2016 | party     |   36 |    36 |    36 |
+| ICCS\_year | Indicator |  mean | lower | upper |
+| ---------: | :-------- | ----: | ----: | ----: |
+|       1999 | obey      | 0.945 | 0.943 | 0.947 |
+|       2009 | obey      | 0.893 | 0.891 | 0.896 |
+|       2016 | obey      | 0.914 | 0.912 | 0.916 |
+|       1999 | rights    | 0.834 | 0.831 | 0.838 |
+|       2009 | rights    | 0.828 | 0.825 | 0.832 |
+|       2016 | rights    | 0.822 | 0.819 | 0.826 |
+|       1999 | local     | 0.823 | 0.819 | 0.826 |
+|       2009 | local     | 0.809 | 0.805 | 0.812 |
+|       2016 | local     | 0.804 | 0.801 | 0.807 |
+|       1999 | work      | 0.813 | 0.809 | 0.816 |
+|       2009 | work      | 0.815 | 0.811 | 0.818 |
+|       2016 | work      | 0.836 | 0.833 | 0.839 |
+|       1999 | envir     | 0.818 | 0.815 | 0.822 |
+|       2009 | envir     | 0.852 | 0.849 | 0.855 |
+|       2016 | envir     | 0.851 | 0.848 | 0.854 |
+|       1999 | vote      | 0.785 | 0.781 | 0.789 |
+|       2009 | vote      | 0.806 | 0.802 | 0.809 |
+|       2016 | vote      | 0.814 | 0.811 | 0.817 |
+|       1999 | history   | 0.714 | 0.709 | 0.718 |
+|       2009 | history   | 0.778 | 0.774 | 0.782 |
+|       2016 | history   | 0.807 | 0.804 | 0.810 |
+|       1999 | respect   | 0.716 | 0.712 | 0.720 |
+|       2009 | respect   | 0.804 | 0.801 | 0.808 |
+|       2016 | respect   | 0.836 | 0.833 | 0.839 |
+|       1999 | news      | 0.697 | 0.693 | 0.701 |
+|       2009 | news      | 0.739 | 0.736 | 0.743 |
+|       2016 | news      | 0.756 | 0.753 | 0.760 |
+|       1999 | protest   | 0.655 | 0.650 | 0.659 |
+|       2009 | protest   | 0.626 | 0.621 | 0.630 |
+|       2016 | protest   | 0.611 | 0.607 | 0.615 |
+|       1999 | discuss   | 0.419 | 0.414 | 0.423 |
+|       2009 | discuss   | 0.382 | 0.378 | 0.387 |
+|       2016 | discuss   | 0.435 | 0.431 | 0.439 |
+|       1999 | party     | 0.309 | 0.305 | 0.313 |
+|       2009 | party     | 0.284 | 0.280 | 0.288 |
+|       2016 | party     | 0.308 | 0.304 | 0.311 |
 
 Line plots:
 
@@ -2146,13 +2155,6 @@ plot_tbl %>%
   labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") 
 ```
 
-    ## Warning: Removed 35 row(s) containing missing values (geom_path).
-
-    ## geom_path: Each group consists of only one observation. Do you need to adjust
-    ## the group aesthetic?
-
-    ## Warning: Removed 35 rows containing missing values (geom_point).
-
 ![](README_files/figure-gfm/line-plots-all-1.png)<!-- -->
 
 ``` r
@@ -2160,13 +2162,6 @@ ggsave("output/mean-citizenship-norm-line-plot-by-year.png")
 ```
 
     ## Saving 10 x 5 in image
-
-    ## Warning: Removed 35 row(s) containing missing values (geom_path).
-
-    ## geom_path: Each group consists of only one observation. Do you need to adjust
-    ## the group aesthetic?
-
-    ## Warning: Removed 35 rows containing missing values (geom_point).
 
 Black and white: add the `theme_bw()` option at the end, and change the
 “color” aesthetic to `lty` to give a different line type for each
@@ -2182,13 +2177,6 @@ plot_tbl %>%
   labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") +
   theme_bw()
 ```
-
-    ## Warning: Removed 35 row(s) containing missing values (geom_path).
-
-    ## geom_path: Each group consists of only one observation. Do you need to adjust
-    ## the group aesthetic?
-
-    ## Warning: Removed 35 rows containing missing values (geom_point).
 
 ![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
 
@@ -2316,17 +2304,17 @@ stata_tbl %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
-    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
-    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
-    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
-    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
-    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 stata_tbl14 <- stata_tbl %>%
@@ -2358,17 +2346,17 @@ stata_tbl14 %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD    id id2   TOTWGTS  obey rights local  work envir
-    ##       <int> <chr>    <dbl> <int> <chr>   <dbl> <int>  <int> <int> <int> <int>
-    ## 1      1999 BGR      70612  5408 BGR7~    19.7     1      1    NA    NA    NA
-    ## 2      1999 BGR     100301  5409 BGR1~    18.0     1      1     0     1     1
-    ## 3      1999 BGR     100303  5410 BGR1~    18.0     0      0     0     1     0
-    ## 4      1999 BGR     100311  5411 BGR1~    18.0     1      1     0     1     1
-    ## 5      1999 BGR     160619  5412 BGR1~    11.8     0      0     0     0     0
-    ## 6      1999 BGR     300320  5413 BGR3~    41.4     0      1     1     1     1
-    ## # ... with 12 more variables: vote <int>, history <int>, respect <int>,
-    ## #   news <int>, protest <int>, discuss <int>, party <int>, female <dbl>,
-    ## #   books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD    id id2   TOTWGTS  obey rights local  work
+    ##       <int> <chr>    <dbl> <int> <chr>   <dbl> <int>  <int> <int> <int>
+    ## 1      1999 BGR      70612  5408 BGR7…    19.7     1      1    NA    NA
+    ## 2      1999 BGR     100301  5409 BGR1…    18.0     1      1     0     1
+    ## 3      1999 BGR     100303  5410 BGR1…    18.0     0      0     0     1
+    ## 4      1999 BGR     100311  5411 BGR1…    18.0     1      1     0     1
+    ## 5      1999 BGR     160619  5412 BGR1…    11.8     0      0     0     0
+    ## 6      1999 BGR     300320  5413 BGR3…    41.4     0      1     1     1
+    ## # … with 13 more variables: envir <int>, vote <int>, history <int>,
+    ## #   respect <int>, news <int>, protest <int>, discuss <int>, party <int>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ``` r
 haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
