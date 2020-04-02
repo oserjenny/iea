@@ -643,9 +643,9 @@ plot_tbl <- tbl %>%
          cols = map(value, ~ data.frame(t(.)))) %>% 
   unnest(cols) %>% 
   select(-value) %>% 
-  mutate(mean  = as.numeric(X1),
-         lower = as.numeric(X2),
-         upper = as.numeric(X3)) %>% 
+  mutate(mean  = as.numeric(as.character(X1)),
+         lower = as.numeric(as.character(X2)),
+         upper = as.numeric(as.character(X3))) %>% 
   select(-c(X1, X2, X3))
 
 plot_tbl %>% 
