@@ -1,7 +1,7 @@
 ---
 title: "Citizenship Norms 1999-2009-2016"
 author: "Jennifer Oser"
-date: "March, 2020"
+date: "April, 2020"
 output: 
   github_document
 editor_options: 
@@ -540,25 +540,6 @@ tbl %>% head()
 ```
 
 
-Attach factor labels to the citizenship norm indicators for internal use in R (but without exporting the factor labels to the output ".dat"" file for Latent Gold LCA analysis). 
-
-```{r}
-
-example <- tbl %>% 
-  mutate_at(cit_norm_indicators,
-            funs(haven::labelled(., labels = c("not important" = 0, "important" = 1))))
-
-# cit norm indicator vars are now int+lbl type
-example %>% 
-  glimpse()
-
-# access labels by converting those vars to factors
-example %>% 
-  mutate_at(cit_norm_indicators, funs(as_factor(.)))
-```
-
-
-
 Export recoded data: 
 
 Single dat file for all countries and all 3 time points:
@@ -582,7 +563,26 @@ tbl %>%
 ```
 
 
+Attach factor labels to the citizenship norm indicators for internal use in R (but without exporting the factor labels to the output ".dat"" file for Latent Gold LCA analysis). 
+
+```{r}
+
+example <- tbl %>% 
+  mutate_at(cit_norm_indicators,
+            funs(haven::labelled(., labels = c("not important" = 0, "important" = 1))))
+
+# cit norm indicator vars are now int+lbl type
+example %>% 
+  glimpse()
+
+# access labels by converting those vars to factors
+example %>% 
+  mutate_at(cit_norm_indicators, funs(as_factor(.)))
+```
+
+
 ## Tables:
+
 
 Means of citizenship norm indicators by country and year.
 
@@ -820,7 +820,7 @@ stata_tbl14 %>% head()
 ```
 
 
-```{r}
+```{r, eval=FALSE}
 
 haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 

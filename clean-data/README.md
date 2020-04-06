@@ -1742,6 +1742,43 @@ tbl %>% head()
     ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
     ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
+Export recoded data:
+
+Single dat file for all countries and all 3 time points:
+`iea/clean-data` directory.
+
+``` r
+write_delim(tbl, "output/clean_tbl.dat", delim = ",")
+```
+
+Separate country-year .dat files for all countries, all 3 time points:
+
+``` r
+tbl %>% 
+  mutate(country_year = paste0(COUNTRY, "-", ICCS_year)) %>% 
+  group_by(country_year) %>% 
+  group_walk(~ write_delim(.x, paste0("output/country-year/", .y$country_year, ".dat"), delim = ","))
+```
+
+    ## # A tibble: 329,135 x 24
+    ## # Groups:   country_year [90]
+    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
+    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
+    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
+    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
+    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
+    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
+    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1       0
+    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1       1
+    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0       0
+    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1       1
+    ## # ... with 329,125 more rows, and 13 more variables: respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>,
+    ## #   country_year <chr>
+
 Attach factor labels to the citizenship norm indicators for internal use
 in R (but without exporting the factor labels to the output “.dat”" file
 for Latent Gold LCA analysis).
@@ -1804,40 +1841,6 @@ example %>%
     ## # ... with 329,125 more rows, and 12 more variables: respect <fct>, news <fct>,
     ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
     ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
-
-Export recoded data for LCA `ICCS-2019/clean-data` directory.
-
-``` r
-write_delim(tbl, "output/clean_tbl.dat", delim = ",")
-```
-
-Generate separate country-year .dat files:
-
-``` r
-tbl %>% 
-  mutate(country_year = paste0(COUNTRY, "-", ICCS_year)) %>% 
-  group_by(country_year) %>% 
-  group_walk(~ write_delim(.x, paste0("output/country-year/", .y$country_year, ".dat"), delim = ","))
-```
-
-    ## # A tibble: 329,135 x 24
-    ## # Groups:   country_year [90]
-    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
-    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
-    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
-    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
-    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
-    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
-    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1       0
-    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1       1
-    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0       0
-    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1       1
-    ## # ... with 329,125 more rows, and 13 more variables: respect <int>, news <int>,
-    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
-    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>,
-    ## #   country_year <chr>
 
 ## Tables:
 
