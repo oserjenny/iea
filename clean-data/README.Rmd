@@ -560,7 +560,7 @@ example %>%
 
 
 Export recoded data for LCA 
-`ICCS-2019/clean-data` directory.
+`iea/clean-data` directory.
 
 ```{r}
 
