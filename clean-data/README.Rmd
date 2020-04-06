@@ -577,7 +577,7 @@ tbl14countries_3waves %>% head()
 
 ```{r}
 
-write_delim(tbl14countries_3waves, "output/clean_tbl.dat", delim = ",")
+write_delim(tbl14countries_3waves, "output/tbl14countries_3waves.dat", delim = ",")
 
 ```
 
