@@ -559,7 +559,9 @@ example %>%
 
 
 
-Export recoded data for LCA 
+Export recoded data: 
+
+Single dat file for all countries and all 3 time points:
 `iea/clean-data` directory.
 
 ```{r}
@@ -569,7 +571,7 @@ write_delim(tbl, "output/clean_tbl.dat", delim = ",")
 ```
 
 
-Generate separate country-year .dat files:
+Separate country-year .dat files for all countries, all 3 time points:
 
 ```{r}
 tbl %>% 
