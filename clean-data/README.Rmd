@@ -820,7 +820,7 @@ stata_tbl14 %>% head()
 ```
 
 
-```{r, eval=FALSE}
+```{r}
 
 haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 
