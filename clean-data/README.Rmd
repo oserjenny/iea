@@ -915,5 +915,10 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 ```
 
 
+Loading example file from 2016 data to experiment with recoding 
+```{r}
+load_files("../data/37147-0064-Data.rda")
 
+
+```
 
