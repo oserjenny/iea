@@ -540,14 +540,44 @@ tbl %>% head()
 ```
 
 
-Export recoded data: 
+Export recoded data files: 
 
-Single dat file for all countries and all 3 time points:
+Export single dat file for all countries and all 3 time points:
 `iea/clean-data` directory.
 
 ```{r}
 
 write_delim(tbl, "output/clean_tbl.dat", delim = ",")
+
+```
+
+Export single dat file for 14 countries that participate in all 3 time points:
+
+```{r}
+# Select for countries in all 3 waves only
+
+all_wave_countries <- tbl %>%
+  count(COUNTRY, ICCS_year) %>% 
+  count(COUNTRY) %>%
+  filter(n == 3) %>% 
+  pull(COUNTRY)
+
+all_wave_countries %>% head()
+```
+
+```{r}
+#Filter by countries in all 3 waves
+
+tbl14countries_3waves <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries)
+  
+tbl14countries_3waves %>% head()
+
+```
+
+```{r}
+
+write_delim(tbl14countries_3waves, "output/clean_tbl.dat", delim = ",")
 
 ```
 
