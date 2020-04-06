@@ -1742,13 +1742,140 @@ tbl %>% head()
     ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
     ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
-Export recoded data:
+Export recoded data files:
 
-Single dat file for all countries and all 3 time points:
+Export single dat file for all countries and all 3 time points:
 `iea/clean-data` directory.
 
 ``` r
 write_delim(tbl, "output/clean_tbl.dat", delim = ",")
+```
+
+Export single dat file for 14 countries that participate in all 3 time
+points:
+
+``` r
+# Select for countries in all 3 waves only
+
+all_wave_countries <- tbl %>%
+  count(COUNTRY, ICCS_year) %>% 
+  count(COUNTRY) %>%
+  filter(n == 3) %>% 
+  pull(COUNTRY)
+
+all_wave_countries %>% head()
+```
+
+    ## [1] "BGR" "CHL" "COL" "DNK" "EST" "FIN"
+
+``` r
+#Filter by countries in all 3 waves
+
+tbl14countries_3waves <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries)
+  
+tbl14countries_3waves %>% head()
+```
+
+    ## # A tibble: 6 x 23
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
+    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
+    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
+    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+
+``` r
+write_delim(tbl14countries_3waves, "output/tbl14countries_3waves.dat", delim = ",")
+```
+
+Export dat file for 14 countries in 1999 only:
+
+``` r
+#Filter by countries in all 3 waves
+
+tbl14countries_1999 <- tbl14countries_3waves %>% 
+  filter(ICCS_year == 1999)
+  
+tbl14countries_1999 %>% head()
+```
+
+    ## # A tibble: 6 x 23
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
+    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
+    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
+    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+
+``` r
+write_delim(tbl14countries_1999, "output/tbl14countries_1999.dat", delim = ",")
+```
+
+Export dat file for 14 countries in 2009 only:
+
+``` r
+#Filter by countries in all 3 waves
+
+tbl14countries_2009 <- tbl14countries_3waves %>% 
+  filter(ICCS_year == 2009)
+  
+tbl14countries_2009 %>% head()
+```
+
+    ## # A tibble: 6 x 23
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ## 1      2009 BGR     1.00e7    38.3     1      1     1     1     1     1       1
+    ## 2      2009 BGR     1.00e7    38.3     1      1     0     1     1     0       1
+    ## 3      2009 BGR     1.00e7    38.3    NA     NA    NA     1    NA    NA      NA
+    ## 4      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA      NA
+    ## 5      2009 BGR     1.00e7    38.3     0      1     1     1     1     1       1
+    ## 6      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA      NA
+    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
+    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
+    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+
+``` r
+write_delim(tbl14countries_2009, "output/tbl14countries_2009.dat", delim = ",")
+```
+
+Export dat file for 14 countries in 2016 only:
+
+``` r
+#Filter by countries in all 3 waves
+
+tbl14countries_2016 <- tbl14countries_3waves %>% 
+  filter(ICCS_year == 2016)
+  
+tbl14countries_2016 %>% head()
+```
+
+    ## # A tibble: 6 x 23
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ## 1      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
+    ## 2      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
+    ## 3      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
+    ## 4      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
+    ## 5      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
+    ## 6      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       0
+    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
+    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
+    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+
+``` r
+write_delim(tbl14countries_2016, "output/tbl14countries_2016.dat", delim = ",")
 ```
 
 Separate country-year .dat files for all countries, all 3 time points:
@@ -2172,7 +2299,7 @@ plot_tbl %>%
   theme_bw()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-34-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-43-1.png)<!-- -->
 
 Alternate representation of same data: plot indicators separately and
 `facet_wrap()` the plots so they are all in one image. Advantage to this
@@ -2240,7 +2367,7 @@ plot_tbl %>%
   labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-35-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-44-1.png)<!-- -->
 
 ``` r
 ggsave("output/mean-citizenship-norm-bar-plot-by-indicator.png")
@@ -2263,7 +2390,7 @@ plot_tbl %>%
   theme_bw() + scale_fill_grey()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-45-1.png)<!-- -->
 
 ``` r
 ggsave("output/14cntry-mean-citizenship-norm-bar-plot-by-indicator-bw.png")
