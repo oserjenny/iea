@@ -582,6 +582,31 @@ write_delim(tbl14countries_3waves, "output/tbl14countries_3waves.dat", delim = "
 ```
 
 
+Export dat file for 14 countries in 1999 only:
+
+```{r}
+#Filter by countries in all 3 waves
+
+tbl14countries_3waves <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries)
+  filter(ICCS_year == 1999)
+  
+tbl14countries_1999 %>% head()
+
+```
+
+```{r}
+
+write_delim(tbl14countries_1999, "output/tbl14countries_1999.dat", delim = ",")
+
+```
+
+
+
+
+
+XXX
+
 Separate country-year .dat files for all countries, all 3 time points:
 
 ```{r}
