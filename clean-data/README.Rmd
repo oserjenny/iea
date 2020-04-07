@@ -923,6 +923,7 @@ tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
 
 ```
 
+**NONNATIVEBORN
 View count frequencies of IS3G04A variable (country of birth) for recode
 QQ: check missings are being recoded appropriately for dat output as "."
 ```{r}
@@ -939,7 +940,6 @@ tbl_belg2016 <- tbl_belg2016 %>%
   ))
 ```
 
-
 Confirm "nonnativeborn" recode is correct
 ```{r}
 tbl_belg2016  %>% 
@@ -952,13 +952,13 @@ tbl_belg2016  %>%
 ```
 
 
+**IMMIGRANTFAM
 View count frequencies of S_IMMIG variable (country of birth) for recode
 QQ: check missings are being recoded appropriately for dat output as "."
 ```{r}
 tbl_belg2016 %>% count(S_IMMIG)
 
 ```
-
 
 Do recode of S_IMMIG var --> "immigrantfam"
 Note: distinction between "nonnativeborn" and "immigrantfam":
@@ -976,7 +976,6 @@ tbl_belg2016 <- tbl_belg2016 %>%
     S_IMMIG == "(3) Students and parent(s) born abroad"                  ~1,
   ))
 ```
-
 
 Confirm "immigrantfam" recode is correct
 ```{r}
