@@ -547,7 +547,7 @@ Export single dat file for all countries and all 3 time points:
 
 ```{r}
 
-write_delim(tbl, "output/clean_tbl.dat", delim = ",")
+write_delim(tbl, "output/tbl_allcountries_3waves.dat", delim = ",")
 
 ```
 
