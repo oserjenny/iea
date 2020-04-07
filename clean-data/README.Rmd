@@ -924,8 +924,15 @@ tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
 ```
 
 
+View count frequencies of immigration variable for recode
 ```{r}
-tbl_belg2016 %>% tbl_belg2016
-  count(IS3G04A)
+tbl_belg2016 %>% count(IS3G04A)
 
 ```
+
+Do recode / mutate of immigration var --> "nonnativeborn"
+```{r}
+tbl_belg2016 %>% count(IS3G04A)
+
+```
+
