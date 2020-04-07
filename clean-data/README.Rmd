@@ -933,7 +933,7 @@ Do recode / mutate of immigration var --> "nonnativeborn"
 ```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(nonnativeborn = case_when(
-    IS3G04A == "(0) Other"                                ~1
+    IS3G04A == "(0) Other"                                ~1,
     IS3G04A == "(1) Country of birth is country of test"  ~0
   ))
 ```
