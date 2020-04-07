@@ -940,7 +940,7 @@ tbl_belg2016 <- tbl_belg2016 %>%
 ```
 
 
-Confirm recode is correct
+Confirm "nonnativeborn" recode is correct
 ```{r}
 tbl_belg2016  %>% 
   count (IS3G04A, nonnativeborn)
@@ -977,4 +977,14 @@ tbl_belg2016 <- tbl_belg2016 %>%
   ))
 ```
 
-S_IMMIG
+
+Confirm "immigrantfam" recode is correct
+```{r}
+tbl_belg2016  %>% 
+  count (S_IMMIG, immigrantfam)
+```
+
+```{r}
+tbl_belg2016  %>% 
+  count (immigrantfam)
+```
