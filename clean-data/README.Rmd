@@ -108,6 +108,7 @@ tbl1 %>%
 
 
 Repeat for all cit norm indicators. NOTE: BS3B12 recoded separately below b/c of typo in string variable.
+QQ: fix "funs" error that results from following chunk of code by using tilda
 
 ```{r}
 
@@ -925,7 +926,10 @@ tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
 
 **NONNATIVEBORN
 View count frequencies of IS3G04A variable (country of birth) for recode
-QQ: check missings are being recoded appropriately for dat output as "."
+QQ: address warning message that results from next chunk: 
+"Factor `IS3G04A` contains implicit NA, consider using `forcats::fct_explicit_na`" 
+
+
 ```{r}
 tbl_belg2016 %>% count(IS3G04A)
 
