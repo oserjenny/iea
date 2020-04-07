@@ -923,14 +923,14 @@ tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
 
 ```
 
-View count frequencies of immigration variable for recode
+View count frequencies of IS3G04A variable (country of birth) for recode
 QQ: check missings are being recoded appropriately for dat output as "."
 ```{r}
 tbl_belg2016 %>% count(IS3G04A)
 
 ```
 
-Do recode / mutate of immigration var --> "nonnativeborn"
+Do recode of IS3G04A var --> "nonnativeborn"
 ```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(nonnativeborn = case_when(
@@ -945,3 +945,36 @@ Confirm recode is correct
 tbl_belg2016  %>% 
   count (IS3G04A, nonnativeborn)
 ```
+
+```{r}
+tbl_belg2016  %>% 
+  count (nonnativeborn)
+```
+
+
+View count frequencies of S_IMMIG variable (country of birth) for recode
+QQ: check missings are being recoded appropriately for dat output as "."
+```{r}
+tbl_belg2016 %>% count(S_IMMIG)
+
+```
+
+
+Do recode of S_IMMIG var --> "immigrantfam"
+Note: distinction between "nonnativeborn" and "immigrantfam":
+"nonnativeborn" = 14yo respondent not born in country of test
+                  Belgium 2016 = 7.81% of population
+"immigrantfam" = 14yo and parent(s) born abroad 
+                  Belgium 2016 = 6.45% of population
+thus "immigrantfam" is likely to be a smaller and more "foreign" subset of sample
+
+```{r}
+tbl_belg2016 <- tbl_belg2016 %>%
+  mutate(immigrantfam = case_when(
+    S_IMMIG == "(1) \tAt least one parent born in country"               ~0,
+    S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~0,
+    S_IMMIG == "(3) Students and parent(s) born abroad"                  ~1,
+  ))
+```
+
+S_IMMIG
