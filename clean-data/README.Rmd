@@ -987,3 +987,6 @@ tbl_belg2016  %>%
 tbl_belg2016  %>% 
   count (immigrantfam)
 ```
+
+
+ADD COUNTRY-LEVEL GDP VARIABLE FOR 2016 DATA
