@@ -938,3 +938,9 @@ tbl_belg2016 <- tbl_belg2016 %>%
   ))
 ```
 
+
+Confirm recode is correct
+```{r}
+tbl_belg2016  %>% 
+  count (IS3G04A, nonnativeborn)
+```
