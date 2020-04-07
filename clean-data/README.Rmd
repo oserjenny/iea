@@ -114,7 +114,7 @@ QQ: fix "funs" error that results from following chunk of code by using tilda
 
 tbl1 <-tbl1 %>% 
   mutate_at(vars(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B3),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important"= c("(1) not important", "(2) somewhat unimportant"),
                                     "important"    = c("(3) somewhat important", "(4) very important")))
   )
@@ -246,7 +246,8 @@ tbl2 <- files %>%
   reduce(rbind) %>% 
   as_tibble() %>% 
   mutate(`ICCS_year` = 2009) %>%     # survey year variable creation
-  select(`ICCS_year`, everything())
+  select(`ICCS_year`, everything()) %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -267,7 +268,7 @@ Recode all cit norm indicators.
 
 tbl2 <- tbl2 %>% 
   mutate_at(vars(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important" = c("(3) NOT VERY IMPORTANT", "(4) NOT IMPORTANT AT ALL"),
                                     "important"     = c("(1) VERY IMPORTANT", "(2) QUITE IMPORTANT")))
   )
@@ -387,7 +388,8 @@ tbl3 <- files %>%
   reduce(rbind) %>% 
   as_tibble()%>% 
   mutate(`ICCS_year` = 2016) %>%    # create survey year variable
-  select(`ICCS_year`, everything())
+  select(`ICCS_year`, everything()) %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -409,7 +411,7 @@ Recode all cit norm indicators.
 
 tbl3 <- tbl3 %>% 
   mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important" = c("(3) Not very important", "(4) Not important at all"),
                                     "important"     = c("(1) Very important", "(2) Quite important")))
   )
@@ -528,7 +530,7 @@ cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, res
 
 tbl <- tbl %>% 
   mutate_at(cit_norm_indicators,
-            funs(case_when(
+            list( ~ case_when(
               . == "not important" ~ 0L,
               . == "important"     ~ 1L,
               TRUE~NA_integer_
@@ -658,7 +660,7 @@ Attach factor labels to the citizenship norm indicators for internal use in R (b
 
 example <- tbl %>% 
   mutate_at(cit_norm_indicators,
-            funs(haven::labelled(., labels = c("not important" = 0, "important" = 1))))
+            list(~haven::labelled(., labels = c("not important" = 0, "important" = 1))))
 
 # cit norm indicator vars are now int+lbl type
 example %>% 
@@ -666,7 +668,7 @@ example %>%
 
 # access labels by converting those vars to factors
 example %>% 
-  mutate_at(cit_norm_indicators, funs(as_factor(.)))
+  mutate_at(cit_norm_indicators, list(~as_factor(.)))
 ```
 
 
@@ -680,7 +682,7 @@ Means of citizenship norm indicators by country and year.
 # count and percent of responses to "obey" grouped by year
 means <- tbl %>%
   group_by(COUNTRY, ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, funs(round(mean(., na.rm = TRUE), 3)))
+  summarize_at(cit_norm_indicators, list(~round(mean(., na.rm = TRUE), 3)))
 
 means %>% 
   knitr::kable()
@@ -693,7 +695,7 @@ Count and percentage of missing values for each indicator by country and year.
 missing <- tbl %>% 
   group_by(COUNTRY, ICCS_year) %>% 
   summarize_at(cit_norm_indicators,
-               funs(paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
+               list(~paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
 
 missing %>% 
   knitr::kable()
@@ -725,7 +727,7 @@ all_wave_countries <- tbl %>%
 plot_tbl <- tbl %>% 
   filter(COUNTRY %in% all_wave_countries) %>% 
   group_by(ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, funs(t.test(.) %>%
+  summarize_at(cit_norm_indicators, list(~t.test(.) %>%
                                            broom::tidy() %>%
                                            mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
                                            pull(mean_ci))) %>% 
@@ -920,7 +922,9 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 
 View count of immigration var for recode
 ```{r}
-tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
+tbl_belg2016 <- load_files("../data/37147-0064-Data.rda") %>% 
+  as_tibble() %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 
 ```
 
@@ -931,7 +935,8 @@ QQ: address warning message that results from next chunk:
 
 
 ```{r}
-tbl_belg2016 %>% count(IS3G04A)
+tbl_belg2016 %>%
+  count(IS3G04A)
 
 ```
 
@@ -947,7 +952,7 @@ tbl_belg2016 <- tbl_belg2016 %>%
 Confirm "nonnativeborn" recode is correct
 ```{r}
 tbl_belg2016  %>% 
-  count (IS3G04A, nonnativeborn)
+  count(IS3G04A, nonnativeborn)
 ```
 
 ```{r}
@@ -984,12 +989,12 @@ tbl_belg2016 <- tbl_belg2016 %>%
 Confirm "immigrantfam" recode is correct
 ```{r}
 tbl_belg2016  %>% 
-  count (S_IMMIG, immigrantfam)
+  count(S_IMMIG, immigrantfam)
 ```
 
 ```{r}
 tbl_belg2016  %>% 
-  count (immigrantfam)
+  count(immigrantfam)
 ```
 
 
