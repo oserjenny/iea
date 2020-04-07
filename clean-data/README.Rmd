@@ -915,15 +915,17 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 ```
 
 
-Loading example file from Belgium 2016 data to experiment with recoding 
-```{r}
-load_files("../data/37147-0064-Data.rda")
-
-```
+2016 recode of specific variables
 
 View count of immigration var for recode
 ```{r}
-tbl_belg2016 <- tbl_belg2016
+tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
+
+```
+
+
+```{r}
+tbl_belg2016 %>% tbl_belg2016
   count(IS3G04A)
 
 ```
