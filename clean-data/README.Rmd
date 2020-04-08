@@ -1075,6 +1075,12 @@ recoded_vars_2step  <- c("female", "books", "edexp", "ed_mom", "ed_dad", "nonnat
 map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
 ```
 
+QQ add here code for creating 4 variables:
+  gdp_constant
+  log_gdp_constant
+  gdp_currentusd
+  log_gdp_currentusd
+
 
 
 
@@ -1105,7 +1111,11 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          ed_dad,
          nonnat_born,
          immigrantfam,
-         nonnat_lang)
+         nonnat_lang
+         gdp_constant
+         log_gdp_constant
+         gdp_currentusd
+         log_gdp_currentusd)
 
 tbl_allcountries_2016_2step %>% head()
 ```
