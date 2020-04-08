@@ -925,8 +925,8 @@ Do recode of IS3G04A var --> "nonnat_born"
 ```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(nonnat_born = case_when(
-    IS3G04A == "(0) Other"                                ~1,
-    IS3G04A == "(1) Country of birth is country of test"  ~0
+    IS3G04A == "(0) Other"                                ~ 1,
+    IS3G04A == "(1) Country of birth is country of test"  ~ 0
   ))
 ```
 
@@ -961,9 +961,9 @@ thus "immigrantfam" is likely to be a smaller and more "foreign" subset of sampl
 ```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(immigrantfam = case_when(
-    S_IMMIG == "(1) \tAt least one parent born in country"               ~0,
-    S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~0,
-    S_IMMIG == "(3) Students and parent(s) born abroad"                  ~1,
+    S_IMMIG == "(1) \tAt least one parent born in country"               ~ 0,
+    S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~ 0,
+    S_IMMIG == "(3) Students and parent(s) born abroad"                  ~ 1,
   ))
 ```
 
@@ -987,17 +987,24 @@ tbl_belg2016 %>% count(IS3G05)
 ```
 
 
-Do recode of IS3G05 var –> “nonnat_lang” Note: distinction between “nonnativeborn” and “immigrantfam”: “nonnativeborn” = 14yo respondent not born in country of test Belgium 2016 = 7.81% of population “immigrantfam” = 14yo and parent(s) born abroad Belgium 2016 = 6.45% of population thus “immigrantfam” is likely to be a smaller and more “foreign” subset of sample
+Do recode of IS3G05 var –> “nonnat_lang” 
 
+```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
-  mutate(immigrantfam = case_when(
-    S_IMMIG == "(1) \tAt least one parent born in country"               ~0,
-    S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~0,
-    S_IMMIG == "(3) Students and parent(s) born abroad"                  ~1,
-  ))
+  mutate(nonnat_lang = case_when(
+    IS3G05 == "(0) Other"                                 ~ 1,
+    IS3G05 == "(1) Language at home is language of test"  ~ 0,
+    ))
+```
+
+Confirm “nonnativeborn” recode is correct
+
+```{r}
+tbl_belg2016  %>% 
+  count(IS3G05, nonnat_lang)
+```
 
 
-XX
 Load all 2016 countries to select for previously coded variables along with these new ones
 
 ```{r}
@@ -1006,7 +1013,7 @@ tbl_allcountries_2016_2step <- files %>%
   map(~ .x %>%
         load_files() %>%
         select(COUNTRY, IDCNTRY, IDSTUD, IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J,
-               IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B, S_GENDER, IS3G11, IS3G03, IS3G07, IS3G09, TOTWGTS)) %>% 
+               IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B, S_GENDER, IS3G11, IS3G03, IS3G07, IS3G09, TOTWGTS, IS3G04A, S_IMMIG, IS3G05)) %>% 
   reduce(rbind) %>% 
   as_tibble()%>% 
   mutate(`ICCS_year` = 2016) %>%    # create survey year variable
