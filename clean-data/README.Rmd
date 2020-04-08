@@ -921,24 +921,24 @@ tbl_belg2016 %>%
 
 ```
 
-Do recode of IS3G04A var --> "nonnativeborn"
+Do recode of IS3G04A var --> "nonnat_born"
 ```{r}
 tbl_belg2016 <- tbl_belg2016 %>%
-  mutate(nonnativeborn = case_when(
+  mutate(nonnat_born = case_when(
     IS3G04A == "(0) Other"                                ~1,
     IS3G04A == "(1) Country of birth is country of test"  ~0
   ))
 ```
 
-Confirm "nonnativeborn" recode is correct
+Confirm "nonnat_born" recode is correct
 ```{r}
 tbl_belg2016  %>% 
-  count(IS3G04A, nonnativeborn)
+  count(IS3G04A, nonnat_born)
 ```
 
 ```{r}
 tbl_belg2016  %>% 
-  count (nonnativeborn)
+  count (nonnat_born)
 ```
 
 
@@ -977,6 +977,24 @@ tbl_belg2016  %>%
 tbl_belg2016  %>% 
   count(immigrantfam)
 ```
+
+
+**NON-NATIVE LANGUAGE View count frequencies of IS3G05
+
+```{r}
+
+tbl_belg2016 %>% count(IS3G05)
+```
+
+
+Do recode of IS3G05 var –> “nonnat_lang” Note: distinction between “nonnativeborn” and “immigrantfam”: “nonnativeborn” = 14yo respondent not born in country of test Belgium 2016 = 7.81% of population “immigrantfam” = 14yo and parent(s) born abroad Belgium 2016 = 6.45% of population thus “immigrantfam” is likely to be a smaller and more “foreign” subset of sample
+
+tbl_belg2016 <- tbl_belg2016 %>%
+  mutate(immigrantfam = case_when(
+    S_IMMIG == "(1) \tAt least one parent born in country"               ~0,
+    S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~0,
+    S_IMMIG == "(3) Students and parent(s) born abroad"                  ~1,
+  ))
 
 
 XX
