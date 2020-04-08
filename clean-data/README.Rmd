@@ -1076,3 +1076,36 @@ map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% 
 ```
 
 
+
+
+Select for vars to prepare for export
+
+```{r}
+tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         TOTWGTS = TOTWGT,
+         obey    = BS3B1_bin,
+         rights  = BS3B11_bin,
+         local   = BS3B9_bin,
+         work    = BS3B4_bin,
+         envir   = BS3B13_bin,
+         vote    = BS3B2_bin,
+         history = BS3B6_bin,
+         respect = BS3B10_bin,
+         news    = BS3B8_bin,
+         protest = BS3B5_bin,
+         discuss = BS3B12_bin,
+         party   = BS3B3_bin,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad,
+         nonnat_born,
+         immigrantfam,
+         nonnat_lang)
+
+tbl_allcountries_2016_2step %>% head()
+```
