@@ -68,14 +68,6 @@ tbl1 <- tbl1 %>%
 ```
 
 
-View variables
-
-```{r, eval=FALSE}
-
-head(tbl1) %>% View
-```
-
-
 
 Cit norm, count all indicators to begin recode.
 
@@ -327,14 +319,6 @@ sociodem_vars <- c("SGENDER", "IS2G11", "IS2G03", "IS2G07", "IS2G09")
 recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 
 map2(recoded_vars, sociodem_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
-```
-
-
-View variables
-
-```{r, eval=FALSE}
-
-head(tbl2) %>% View
 ```
 
 
