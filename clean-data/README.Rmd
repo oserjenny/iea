@@ -1086,7 +1086,7 @@ QQ add here code for creating 4 GDP variables:
 
 Select for vars to prepare for export
 
-```{r, include=FALSE}
+{r}
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
   select(ICCS_year,
          COUNTRY,
@@ -1118,4 +1118,3 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          log_gdp_currentusd)
 
 tbl_allcountries_2016_2step %>% head()
-```
