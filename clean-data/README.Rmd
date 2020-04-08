@@ -1081,12 +1081,65 @@ QQ add here code for creating 4 GDP variables:
   gdp_currentusd
   log_gdp_currentusd
 
+```{r}
+# Install some version of an xls reading package, e.g., 
+# install.packages("readxl")
+library(readxl)
+
+# Import xlsx that I already have downloaded & saved to github data folder
+# Note: this xlsx has 3 worksheets: 1st documents data, 2nd is GDP in constant ppp 2011; 3rd is GDP current prices US. We can view these using the `excel_sheets()` function from readxl
+readxl::excel_sheets("../data/GDP data downloaded from IMF_3worksheets_Apr2020.xlsx")
+
+# Read in worksheet: “GDP constant ppp 2011; intl$”
+gdp_tbl1 <- readxl::read_excel("../data/GDP data downloaded from IMF_3worksheets_Apr2020.xlsx", 
+                               sheet = "GDP constant ppp 2011; intl$")
 
 
+# (1) Create <gdp_constant> var:
+# Select for “ISO” in GDP worksheet that matches “COUNTRY” 3-letter variable in IEA data
+# Select for year 2015 only - (column W)
+gdp_tbl1 <- gdp_tbl1 %>% 
+  filter(ISO %in% (tbl_allcountries_2016_2step %>% distinct(COUNTRY) %>% pull(COUNTRY))) %>% 
+  select(COUNTRY = ISO, gdp_constant = `2015`) %>% 
+  mutate(gdp_constant = as.numeric(gdp_constant))
 
-Select for vars to prepare for export
+gdp_tbl1
 
-{r}
+# (2) Create logged version of this var called “log_gdp_constant”
+gdp_tbl1 <- gdp_tbl1 %>% 
+  mutate(log_gdp_constant = log(gdp_constant))
+  
+# (3) Create <gdp_currentusd> var
+# Read in worksheet: “GDP current prices US$”
+# Same selection of “ISO” in GDP worksheet that matches “COUNTRY” var in IEA data
+gdp_tbl2 <- readxl::read_excel("../data/GDP data downloaded from IMF_3worksheets_Apr2020.xlsx", 
+                               sheet = "GDP current prices US$") %>% 
+  filter(ISO %in% (tbl_allcountries_2016_2step %>% distinct(COUNTRY) %>% pull(COUNTRY))) %>% 
+  select(COUNTRY = ISO, gdp_currentusd = `2015`) %>% 
+  mutate(gdp_currentusd = as.numeric(gdp_currentusd))
+
+# (4) Create logged version of this var called “log_gdp_currentusd”
+gdp_tbl2 <- gdp_tbl2 %>% 
+  mutate(log_gdp_currentusd = log(gdp_currentusd))
+
+gdp_tbl <- left_join(gdp_tbl1, gdp_tbl2, by = "COUNTRY")
+
+gdp_tbl
+```
+
+Now combine these new variables into existing dataset: `tbl_allcountries_2016_2step`.
+
+```{r}
+tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
+  mutate(COUNTRY = as.character(COUNTRY)) %>% 
+  left_join(gdp_tbl, by = "COUNTRY")
+
+tbl_allcountries_2016_2step %>% head()
+```
+
+
+Select for vars to prepare for export.  In the below, need to swap out BS3 variables with IS3 variables in the `tbl_allcountries_2016_2step` data.
+
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
   select(ICCS_year,
          COUNTRY,
@@ -1116,5 +1169,3 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          log_gdp_constant,
          gdp_currentusd,
          log_gdp_currentusd)
-
-tbl_allcountries_2016_2step %>% head()
