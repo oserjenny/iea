@@ -100,7 +100,6 @@ tbl1 %>%
 
 
 Repeat for all cit norm indicators. NOTE: BS3B12 recoded separately below b/c of typo in string variable.
-QQ: fix "funs" error that results from following chunk of code by using tilda
 
 ```{r}
 
@@ -914,8 +913,6 @@ tbl_belg2016 <- load_files("../data/37147-0064-Data.rda") %>%
 
 **NONNATIVEBORN
 View count frequencies of IS3G04A variable (country of birth) for recode
-QQ: address warning message that results from next chunk: 
-"Factor `IS3G04A` contains implicit NA, consider using `forcats::fct_explicit_na`" 
 
 
 ```{r}
@@ -947,7 +944,7 @@ tbl_belg2016  %>%
 
 **IMMIGRANTFAM
 View count frequencies of S_IMMIG variable (country of birth) for recode
-QQ: check missings are being recoded appropriately for dat output as "."
+
 ```{r}
 tbl_belg2016 %>% count(S_IMMIG)
 
@@ -982,4 +979,34 @@ tbl_belg2016  %>%
 ```
 
 
+Export 2016 all countries with newly coded variables
+
+```{r}
+tbl_allcountries_2016 <- tbl3 %>% 
+  select(ICCS_year,
+         COUNTRY,
+         IDSTUD,
+         TOTWGTS,
+         obey    = IS3G23L_bin,
+         rights  = IS3G23I_bin,
+         local   = IS3G23H_bin,
+         work    = IS3G23K_bin,
+         envir   = IS3G23J_bin,
+         vote    = IS3G23A_bin,
+         history = IS3G23C_bin,
+         respect = IS3G23E_bin,
+         news    = IS3G23D_bin,
+         protest = IS3G23G_bin,
+         discuss = IS3G23F_bin,
+         party   = IS3G23B_bin,
+         female,
+         books,
+         edexp,
+         ed_mom,
+         ed_dad,
+         nonnativeborn,
+         immigrantfam)
+
+tbl3_allcountries_2016 %>% head()
+```
 
