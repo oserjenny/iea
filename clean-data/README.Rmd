@@ -1111,10 +1111,10 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          ed_dad,
          nonnat_born,
          immigrantfam,
-         nonnat_lang
-         gdp_constant
-         log_gdp_constant
-         gdp_currentusd
+         nonnat_lang,
+         gdp_constant,
+         log_gdp_constant,
+         gdp_currentusd,
          log_gdp_currentusd)
 
 tbl_allcountries_2016_2step %>% head()
