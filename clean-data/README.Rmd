@@ -1020,3 +1020,59 @@ tbl_allcountries_2016_2step <- files %>%
   select(`ICCS_year`, everything()) %>% 
   mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
+
+
+Recodes
+
+```{r}
+tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
+  mutate(female = ifelse(S_GENDER == "(0) BOY", 0, 1),   # gender
+         books = case_when(                              # books in respondent's home
+           IS3G11 == "(1) None or very few (0–10 books)"                                ~ 0,
+           IS3G11 == "(2) Enough to fill one shelf (11–25 books)"                       ~ 1,
+           IS3G11 == "(3) Enough to fill one bookcase (26–100 books)"                   ~ 1,
+           IS3G11 == "(4) Enough to fill two bookcase (101–200 books)"                  ~ 2,
+           IS3G11 == "(5) Enough to fill three or more bookcases (more than 200 books)" ~ 3
+         ),
+         edexp = case_when(                              # expected number of additional educ years
+           IS3G03 == "(1) <ISCED level 6, 7 or 8>"   ~ 2,
+           IS3G03 == "(2) <ISCED level 4 or 5>"      ~ 2,
+           IS3G03 == "(3) <ISCED level 3>"           ~ 1,
+           IS3G03 == "(4) <ISCED level 2> or below" ~ 0
+         ),
+         ed_mom = case_when(                             # mother education
+           IS3G07 == "(1) <ISCED level 6, 7 or 8>"              ~ 2,
+           IS3G07 == "(2) <ISCED level 4 or 5>"                 ~ 2,
+           IS3G07 == "(3) <ISCED level 3>"                      ~ 1,
+           IS3G07 == "(4) <ISCED level 2>"                      ~ 0,
+           IS3G07 == "(5) She did not complete <ISCED level 2>" ~ 0
+         ),
+         ed_dad = case_when(                             # father education
+           IS3G09 == "(1) <ISCED level 6, 7 or 8>"             ~ 2,
+           IS3G09 == "(2) <ISCED level 4 or 5>"                ~ 2,
+           IS3G09 == "(3) <ISCED level 3>"                     ~ 1,
+           IS3G09 == "(4) <ISCED level 2>"                     ~ 0,
+           IS3G09 == "(5) He did not complete <ISCED level 2>" ~ 0
+         ),
+         nonnat_born = case_when(                     # non-native born respondent
+           IS3G04A == "(0) Other"                               ~ 1,
+           IS3G04A == "(1) Country of birth is country of test" ~ 0
+         ),
+         immigrantfam = case_when(                   # non-native born respondent & parent(s)
+          S_IMMIG == "(1) \tAt least one parent born in country"              ~ 0,
+          S_IMMIG == "(2) Students born in country but parent(s) born abroad" ~ 0,
+          S_IMMIG == "(3) Students and parent(s) born abroad"                 ~ 1,
+         ),
+         nonnat_lang = case_when(                    # non-native language at home
+          IS3G05 == "(0) Other"                                 ~ 1,
+          IS3G05 == "(1) Language at home is language of test"  ~ 0,
+         )) 
+
+# check recodes
+sociodem_vars_2step <- c("S_GENDER", "IS3G11", "IS3G03", "IS3G07", "IS3G09", "IS3G04A", "S_IMMIG", "IS3G05")
+recoded_vars_2step  <- c("female", "books", "edexp", "ed_mom", "ed_dad", "nonnat_born", "immigrantfam", "nonnat_lang")
+
+map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
+```
+
+
