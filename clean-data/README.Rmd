@@ -901,7 +901,7 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 ```
 
 
-2016 recode of specific variables
+2016 example recode of new specific variables using 1 country rda file (Belgium)
 
 View count of immigration var for recode
 ```{r}
@@ -979,34 +979,19 @@ tbl_belg2016  %>%
 ```
 
 
-Export 2016 all countries with newly coded variables
+XX
+Load all 2016 countries to select for previously coded variables along with these new ones
 
 ```{r}
-tbl_allcountries_2016 <- tbl3 %>% 
-  select(ICCS_year,
-         COUNTRY,
-         IDSTUD,
-         TOTWGTS,
-         obey    = IS3G23L_bin,
-         rights  = IS3G23I_bin,
-         local   = IS3G23H_bin,
-         work    = IS3G23K_bin,
-         envir   = IS3G23J_bin,
-         vote    = IS3G23A_bin,
-         history = IS3G23C_bin,
-         respect = IS3G23E_bin,
-         news    = IS3G23D_bin,
-         protest = IS3G23G_bin,
-         discuss = IS3G23F_bin,
-         party   = IS3G23B_bin,
-         female,
-         books,
-         edexp,
-         ed_mom,
-         ed_dad,
-         nonnativeborn,
-         immigrantfam)
-
-tbl3_allcountries_2016 %>% head()
+tbl_allcountries_2016_2step <- files %>%
+  magrittr::extract(67:90) %>%      # filter to 2016 files only
+  map(~ .x %>%
+        load_files() %>%
+        select(COUNTRY, IDCNTRY, IDSTUD, IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J,
+               IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B, S_GENDER, IS3G11, IS3G03, IS3G07, IS3G09, TOTWGTS)) %>% 
+  reduce(rbind) %>% 
+  as_tibble()%>% 
+  mutate(`ICCS_year` = 2016) %>%    # create survey year variable
+  select(`ICCS_year`, everything()) %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
-
