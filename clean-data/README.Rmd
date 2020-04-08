@@ -699,7 +699,7 @@ write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indi
 
 First, create the table to be used for plotting.
 
-```{r, warning = FALSE}
+```{r}
 all_wave_countries <- tbl %>%
   count(COUNTRY, ICCS_year) %>% 
   count(COUNTRY) %>%
@@ -1075,7 +1075,7 @@ recoded_vars_2step  <- c("female", "books", "edexp", "ed_mom", "ed_dad", "nonnat
 map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
 ```
 
-QQ add here code for creating 4 variables:
+QQ add here code for creating 4 GDP variables:
   gdp_constant
   log_gdp_constant
   gdp_currentusd
@@ -1086,7 +1086,7 @@ QQ add here code for creating 4 variables:
 
 Select for vars to prepare for export
 
-```{r}
+```{r, include=FALSE}
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
   select(ICCS_year,
          COUNTRY,
