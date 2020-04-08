@@ -7,14 +7,20 @@ April, 2020
 library(tidyverse)
 ```
 
-    ## -- Attaching packages ------------------------------------ tidyverse 1.3.0 --
+    ## Registered S3 methods overwritten by 'ggplot2':
+    ##   method         from 
+    ##   [.quosures     rlang
+    ##   c.quosures     rlang
+    ##   print.quosures rlang
 
-    ## v ggplot2 3.3.0     v purrr   0.3.3
-    ## v tibble  2.1.3     v dplyr   0.8.5
-    ## v tidyr   1.0.2     v stringr 1.4.0
-    ## v readr   1.3.1     v forcats 0.5.0
+    ## ── Attaching packages ─────────────────────── tidyverse 1.2.1 ──
 
-    ## -- Conflicts --------------------------------------- tidyverse_conflicts() --
+    ## ✓ ggplot2 3.1.1     ✓ purrr   0.3.3
+    ## ✓ tibble  2.1.3     ✓ dplyr   0.8.4
+    ## ✓ tidyr   1.0.2     ✓ stringr 1.4.0
+    ## ✓ readr   1.3.1     ✓ forcats 0.4.0
+
+    ## ── Conflicts ────────────────────────── tidyverse_conflicts() ──
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -239,28 +245,15 @@ from following chunk of code by using tilda
 ``` r
 tbl1 <-tbl1 %>% 
   mutate_at(vars(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B3),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important"= c("(1) not important", "(2) somewhat unimportant"),
                                     "important"    = c("(3) somewhat important", "(4) very important")))
   )
 ```
 
-    ## Warning: funs() is soft deprecated as of dplyr 0.8.0
-    ## Please use a list of either functions or lambdas: 
-    ## 
-    ##   # Simple named list: 
-    ##   list(mean = mean, median = median)
-    ## 
-    ##   # Auto named with `tibble::lst()`: 
-    ##   tibble::lst(mean, median)
-    ## 
-    ##   # Using lambdas
-    ##   list(~ mean(., trim = .2), ~ median(., na.rm = TRUE))
-    ## This warning is displayed once per session.
-
 BS3B12 error troubleshoot when included in prior chunk. Count table
 output shows that string text of 1st category “importnat” spelled
-incorrectly, i.e. “a” and “n” transposed. BS3B12 “mutate” command to
+incorrectly, i.e. “a” and “n” transposed. BS3B12 “mutate” command to
 correctly recode with this typo:
 
 ``` r
@@ -553,17 +546,17 @@ tbl1 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      1999 AUS      10302    57.2 impo~ not i~ impo~ impo~ impo~ impo~ import~
-    ## 2      1999 AUS      10305    57.2 impo~ not i~ impo~ impo~ impo~ impo~ not im~
-    ## 3      1999 AUS      10311    57.2 impo~ (Miss~ (Mis~ impo~ impo~ not ~ not im~
-    ## 4      1999 AUS      10313    57.2 impo~ not i~ not ~ not ~ not ~ impo~ not im~
-    ## 5      1999 AUS      10317    57.2 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ## 6      1999 AUS      10319    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      1999 AUS      10302    57.2 impo… not i… impo… impo… impo… impo…
+    ## 2      1999 AUS      10305    57.2 impo… not i… impo… impo… impo… impo…
+    ## 3      1999 AUS      10311    57.2 impo… (Miss… (Mis… impo… impo… not …
+    ## 4      1999 AUS      10313    57.2 impo… not i… not … not … not … impo…
+    ## 5      1999 AUS      10317    57.2 impo… impor… impo… not … impo… not …
+    ## 6      1999 AUS      10319    57.2 impo… impor… impo… impo… impo… impo…
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## 2009 dataloading and merging
 
@@ -585,7 +578,8 @@ tbl2 <- files %>%
   reduce(rbind) %>% 
   as_tibble() %>% 
   mutate(`ICCS_year` = 2009) %>%     # survey year variable creation
-  select(`ICCS_year`, everything())
+  select(`ICCS_year`, everything()) %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -598,42 +592,6 @@ original_vars <- tbl2 %>%
 original_vars %>% 
   map(~ tbl2 %>% count(!!sym(.x)))
 ```
-
-    ## Warning: Factor `IS2P21L` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21I` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21H` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21K` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21J` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21C` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21E` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21D` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21G` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21F` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21B` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## [[1]]
     ## # A tibble: 5 x 2
@@ -760,7 +718,7 @@ Recode all cit norm indicators.
 ``` r
 tbl2 <- tbl2 %>% 
   mutate_at(vars(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important" = c("(3) NOT VERY IMPORTANT", "(4) NOT IMPORTANT AT ALL"),
                                     "important"     = c("(1) VERY IMPORTANT", "(2) QUITE IMPORTANT")))
   )
@@ -774,78 +732,6 @@ bin_vars <- original_vars %>%
 
 map2(original_vars, bin_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
 ```
-
-    ## Warning: Factor `IS2P21L` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21L_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21I` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21I_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21H` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21H_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21K` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21K_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21J` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21J_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21A_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21C` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21C_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21E` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21E_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21D` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21D_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21G` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21G_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21F` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21F_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21B` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2P21B_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## [[1]]
     ## # A tibble: 5 x 3
@@ -1011,28 +897,13 @@ recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 map2(recoded_vars, sociodem_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
 ```
 
-    ## Warning: Factor `SGENDER` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2G11` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2G03` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2G07` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS2G09` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
     ## [[1]]
     ## # A tibble: 3 x 3
     ##   female SGENDER      n
     ##    <dbl> <fct>    <int>
     ## 1      0 (0) BOY  68985
     ## 2      1 (1) GIRL 70381
-    ## 3     NA <NA>      1284
+    ## 3      1 <NA>      1284
     ## 
     ## [[2]]
     ## # A tibble: 7 x 3
@@ -1118,17 +989,17 @@ tbl2 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      2009 AUT     1.00e7    26.6 not ~ impor~ impo~ not ~ impo~ impo~ not im~
-    ## 2      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ## 3      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 4      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ not ~ impo~ impo~ import~
-    ## 5      2009 AUT     1.00e7    26.6 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 6      2009 AUT     1.00e7    26.6 impo~ impor~ not ~ impo~ impo~ impo~ import~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      2009 AUT     1.00e7    26.6 not … impor… impo… not … impo… impo…
+    ## 2      2009 AUT     1.00e7    26.6 impo… impor… impo… not … impo… not …
+    ## 3      2009 AUT     1.00e7    26.6 impo… impor… impo… impo… impo… impo…
+    ## 4      2009 AUT     1.00e7    26.6 impo… impor… impo… not … impo… impo…
+    ## 5      2009 AUT     1.00e7    26.6 impo… impor… impo… impo… impo… impo…
+    ## 6      2009 AUT     1.00e7    26.6 impo… impor… not … impo… impo… impo…
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## 2016 data loading and merging
 
@@ -1150,7 +1021,8 @@ tbl3 <- files %>%
   reduce(rbind) %>% 
   as_tibble()%>% 
   mutate(`ICCS_year` = 2016) %>%    # create survey year variable
-  select(`ICCS_year`, everything())
+  select(`ICCS_year`, everything()) %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -1163,42 +1035,6 @@ original_vars <- tbl3 %>%
 original_vars %>% 
   map(~ tbl3 %>% count(!!sym(.x)))
 ```
-
-    ## Warning: Factor `IS3G23L` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23I` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23H` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23K` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23J` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23C` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23E` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23D` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23G` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23F` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23B` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## [[1]]
     ## # A tibble: 5 x 2
@@ -1325,7 +1161,7 @@ Recode all cit norm indicators.
 ``` r
 tbl3 <- tbl3 %>% 
   mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
-            funs(bin = fct_collapse(.,
+            list(bin = ~fct_collapse(.,
                                     "not important" = c("(3) Not very important", "(4) Not important at all"),
                                     "important"     = c("(1) Very important", "(2) Quite important")))
   )
@@ -1339,78 +1175,6 @@ bin_vars <- original_vars %>%
 
 map2(original_vars, bin_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
 ```
-
-    ## Warning: Factor `IS3G23L` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23L_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23I` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23I_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23H` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23H_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23K` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23K_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23J` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23J_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23A_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23C` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23C_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23E` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23E_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23D` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23D_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23G` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23G_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23F` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23F_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23B` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G23B_bin` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## [[1]]
     ## # A tibble: 5 x 3
@@ -1572,39 +1336,24 @@ recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 map2(recoded_vars, sociodem_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
 ```
 
-    ## Warning: Factor `S_GENDER` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G11` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G03` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G07` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
-    ## Warning: Factor `IS3G09` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
     ## [[1]]
     ## # A tibble: 3 x 3
     ##   female S_GENDER     n
     ##    <dbl> <fct>    <int>
     ## 1      1 (0) Boy  47674
     ## 2      1 (1) Girl 46903
-    ## 3     NA <NA>        26
+    ## 3      1 <NA>        26
     ## 
     ## [[2]]
     ## # A tibble: 6 x 3
-    ##   books IS3G11                                                               n
-    ##   <dbl> <fct>                                                            <int>
-    ## 1     0 (1) None or very few (0–10 books)                                14514
-    ## 2     1 (2) Enough to fill one shelf (11–25 books)                       22778
-    ## 3     1 (3) Enough to fill one bookcase (26–100 books)                   29001
-    ## 4     2 (4) Enough to fill two bookcase (101–200 books)                  14512
-    ## 5     3 (5) Enough to fill three or more bookcases (more than 200 books) 12648
-    ## 6    NA <NA>                                                              1150
+    ##   books IS3G11                                                            n
+    ##   <dbl> <fct>                                                         <int>
+    ## 1     0 (1) None or very few (0–10 books)                             14514
+    ## 2     1 (2) Enough to fill one shelf (11–25 books)                    22778
+    ## 3     1 (3) Enough to fill one bookcase (26–100 books)                29001
+    ## 4     2 (4) Enough to fill two bookcase (101–200 books)               14512
+    ## 5     3 (5) Enough to fill three or more bookcases (more than 200 bo… 12648
+    ## 6    NA <NA>                                                           1150
     ## 
     ## [[3]]
     ## # A tibble: 5 x 3
@@ -1669,17 +1418,17 @@ tbl3 %>% head()
 ```
 
     ## # A tibble: 6 x 21
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ## 1      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 2      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 3      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 4      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## 5      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ## 6      2016 BFL     1.00e7    22.5 impo~ impor~ impo~ impo~ impo~ not ~ not im~
-    ## # ... with 10 more variables: respect <fct>, news <fct>, protest <fct>,
-    ## #   discuss <fct>, party <fct>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##       <dbl> <fct>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ## 1      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 2      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 3      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 4      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 5      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… impo…
+    ## 6      2016 BFL     1.00e7    22.5 impo… impor… impo… impo… impo… not …
+    ## # … with 11 more variables: history <fct>, respect <fct>, news <fct>,
+    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ## Combining recoded 1999, 2009 and 2016 data frames
 
@@ -1711,14 +1460,15 @@ tbl %>%
 ## Exporting final combined datafile
 
 Before exporting, convert citizenship norm indicators to integer (0 =
-“not important”, 1 = “important”).
+“not important”, 1 =
+“important”).
 
 ``` r
 cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
 
 tbl <- tbl %>% 
   mutate_at(cit_norm_indicators,
-            funs(case_when(
+            list( ~ case_when(
               . == "not important" ~ 0L,
               . == "important"     ~ 1L,
               TRUE~NA_integer_
@@ -1731,17 +1481,17 @@ tbl %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
-    ## 2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
-    ## 3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
-    ## 4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
-    ## 5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
-    ## 6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 AUS      10302    57.2     1      0     1     1     1     1
+    ## 2      1999 AUS      10305    57.2     1      0     1     1     1     1
+    ## 3      1999 AUS      10311    57.2     1     NA    NA     1     1     0
+    ## 4      1999 AUS      10313    57.2     1      0     0     0     0     1
+    ## 5      1999 AUS      10317    57.2     1      1     1     0     1     0
+    ## 6      1999 AUS      10319    57.2     1      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 Export recoded data files:
 
@@ -1779,17 +1529,17 @@ tbl14countries_3waves %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
-    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
-    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
-    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
-    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
-    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 write_delim(tbl14countries_3waves, "output/tbl14countries_3waves.dat", delim = ",")
@@ -1807,17 +1557,17 @@ tbl14countries_1999 %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
-    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
-    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
-    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
-    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
-    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 write_delim(tbl14countries_1999, "output/tbl14countries_1999.dat", delim = ",")
@@ -1835,17 +1585,17 @@ tbl14countries_2009 %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      2009 BGR     1.00e7    38.3     1      1     1     1     1     1       1
-    ## 2      2009 BGR     1.00e7    38.3     1      1     0     1     1     0       1
-    ## 3      2009 BGR     1.00e7    38.3    NA     NA    NA     1    NA    NA      NA
-    ## 4      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA      NA
-    ## 5      2009 BGR     1.00e7    38.3     0      1     1     1     1     1       1
-    ## 6      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA      NA
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      2009 BGR     1.00e7    38.3     1      1     1     1     1     1
+    ## 2      2009 BGR     1.00e7    38.3     1      1     0     1     1     0
+    ## 3      2009 BGR     1.00e7    38.3    NA     NA    NA     1    NA    NA
+    ## 4      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA
+    ## 5      2009 BGR     1.00e7    38.3     0      1     1     1     1     1
+    ## 6      2009 BGR     1.00e7    38.3    NA     NA    NA    NA    NA    NA
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 write_delim(tbl14countries_2009, "output/tbl14countries_2009.dat", delim = ",")
@@ -1863,17 +1613,17 @@ tbl14countries_2016 %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
-    ## 2      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
-    ## 3      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
-    ## 4      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
-    ## 5      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       1
-    ## 6      2016 BGR     1.00e7    15.4     1      1     1     1     1     1       0
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## 2      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## 3      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## 4      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## 5      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## 6      2016 BGR     1.00e7    15.4     1      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 write_delim(tbl14countries_2016, "output/tbl14countries_2016.dat", delim = ",")
@@ -1890,22 +1640,22 @@ tbl %>%
 
     ## # A tibble: 329,135 x 24
     ## # Groups:   country_year [90]
-    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1       1
-    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1       0
-    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0       0
-    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1       0
-    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0       1
-    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1       0
-    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1       0
-    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1       1
-    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0       0
-    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1       1
-    ## # ... with 329,125 more rows, and 13 more variables: respect <int>, news <int>,
-    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
-    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>,
-    ## #   country_year <chr>
+    ##    ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##        <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ##  1      1999 AUS      10302    57.2     1      0     1     1     1     1
+    ##  2      1999 AUS      10305    57.2     1      0     1     1     1     1
+    ##  3      1999 AUS      10311    57.2     1     NA    NA     1     1     0
+    ##  4      1999 AUS      10313    57.2     1      0     0     0     0     1
+    ##  5      1999 AUS      10317    57.2     1      1     1     0     1     0
+    ##  6      1999 AUS      10319    57.2     1      1     1     1     1     1
+    ##  7      1999 AUS      10324    57.2     1      1     1     1     1     1
+    ##  8      1999 AUS      10325    57.2     1     NA     1     1     1     1
+    ##  9      1999 AUS      10326    57.2     1      1     1     1     1     0
+    ## 10      1999 AUS      10327    57.2     1      1     1     1     1     1
+    ## # … with 329,125 more rows, and 14 more variables: history <int>,
+    ## #   respect <int>, news <int>, protest <int>, discuss <int>, party <int>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>,
+    ## #   id <int>, id2 <chr>, country_year <chr>
 
 Attach factor labels to the citizenship norm indicators for internal use
 in R (but without exporting the factor labels to the output “.dat”" file
@@ -1914,7 +1664,7 @@ for Latent Gold LCA analysis).
 ``` r
 example <- tbl %>% 
   mutate_at(cit_norm_indicators,
-            funs(haven::labelled(., labels = c("not important" = 0, "important" = 1))))
+            list(~haven::labelled(., labels = c("not important" = 0, "important" = 1))))
 
 # cit norm indicator vars are now int+lbl type
 example %>% 
@@ -1923,52 +1673,53 @@ example %>%
 
     ## Observations: 329,135
     ## Variables: 23
-    ## $ ICCS_year <int> 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 199...
-    ## $ COUNTRY   <chr> "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "...
-    ## $ IDSTUD    <dbl> 10302, 10305, 10311, 10313, 10317, 10319, 10324, 10325, 1...
-    ## $ TOTWGTS   <dbl> 57.18350, 57.18350, 57.18350, 57.18350, 57.18350, 57.1835...
-    ## $ obey      <int+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,...
-    ## $ rights    <int+lbl> 0, 0, NA, 0, 1, 1, 1, NA, 1, 1, 1, 1, 1, 1, 1, 1, 0, ...
-    ## $ local     <int+lbl> 1, 1, NA, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
-    ## $ work      <int+lbl> 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1,...
-    ## $ envir     <int+lbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,...
-    ## $ vote      <int+lbl> 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1,...
-    ## $ history   <int+lbl> 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1,...
-    ## $ respect   <int+lbl> 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0,...
-    ## $ news      <int+lbl> 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1,...
-    ## $ protest   <int+lbl> 0, 1, NA, 0, 1, 1, 0, NA, 1, 0, 1, 1, 1, 1, 1, 1, 0, ...
-    ## $ discuss   <int+lbl> 0, 0, NA, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1...
-    ## $ party     <int+lbl> 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,...
-    ## $ female    <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-    ## $ books     <dbl> 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 3, 3, 1, 0, 2, 2, 3, ...
-    ## $ edexp     <dbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 0, 0, 1, 1, ...
-    ## $ ed_mom    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, 2, 2, 2, 2, 0, 2, 2, 2,...
-    ## $ ed_dad    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, NA, 2, 2, 2, 2, 2, 2, 2...
-    ## $ id        <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17...
-    ## $ id2       <chr> "AUS10302", "AUS10305", "AUS10311", "AUS10313", "AUS10317...
+    ## $ ICCS_year <int> 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, 1999, …
+    ## $ COUNTRY   <chr> "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS", "AUS"…
+    ## $ IDSTUD    <dbl> 10302, 10305, 10311, 10313, 10317, 10319, 10324, 10325…
+    ## $ TOTWGTS   <dbl> 57.18350, 57.18350, 57.18350, 57.18350, 57.18350, 57.1…
+    ## $ obey      <int+lbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+    ## $ rights    <int+lbl> 0, 0, NA, 0, 1, 1, 1, NA, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ local     <int+lbl> 1, 1, NA, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…
+    ## $ work      <int+lbl> 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,…
+    ## $ envir     <int+lbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,…
+    ## $ vote      <int+lbl> 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ history   <int+lbl> 1, 0, 0, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ respect   <int+lbl> 0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1,…
+    ## $ news      <int+lbl> 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 1,…
+    ## $ protest   <int+lbl> 0, 1, NA, 0, 1, 1, 0, NA, 1, 0, 1, 1, 1, 1, 1, 1, …
+    ## $ discuss   <int+lbl> 0, 0, NA, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0…
+    ## $ party     <int+lbl> 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+    ## $ female    <dbl> 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, …
+    ## $ books     <dbl> 2, 2, 1, 1, 2, 2, 2, 1, 2, 2, 1, 2, 3, 3, 1, 0, 2, 2, …
+    ## $ edexp     <dbl> 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 2, 1, 1, 0, 0, 1, …
+    ## $ ed_mom    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, 2, 2, 2, 2, 0, 2, 2,…
+    ## $ ed_dad    <dbl> 0, NA, 2, NA, 1, 2, 2, NA, 2, NA, NA, 2, 2, 2, 2, 2, 2…
+    ## $ id        <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,…
+    ## $ id2       <chr> "AUS10302", "AUS10305", "AUS10311", "AUS10313", "AUS10…
 
 ``` r
 # access labels by converting those vars to factors
 example %>% 
-  mutate_at(cit_norm_indicators, funs(as_factor(.)))
+  mutate_at(cit_norm_indicators, list(~as_factor(.)))
 ```
 
     ## # A tibble: 329,135 x 23
-    ##    ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote  history
-    ##        <int> <chr>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct> <fct>  
-    ##  1      1999 AUS      10302    57.2 impo~ not i~ impo~ impo~ impo~ impo~ import~
-    ##  2      1999 AUS      10305    57.2 impo~ not i~ impo~ impo~ impo~ impo~ not im~
-    ##  3      1999 AUS      10311    57.2 impo~ <NA>   <NA>  impo~ impo~ not ~ not im~
-    ##  4      1999 AUS      10313    57.2 impo~ not i~ not ~ not ~ not ~ impo~ not im~
-    ##  5      1999 AUS      10317    57.2 impo~ impor~ impo~ not ~ impo~ not ~ import~
-    ##  6      1999 AUS      10319    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ##  7      1999 AUS      10324    57.2 impo~ impor~ impo~ impo~ impo~ impo~ not im~
-    ##  8      1999 AUS      10325    57.2 impo~ <NA>   impo~ impo~ impo~ impo~ import~
-    ##  9      1999 AUS      10326    57.2 impo~ impor~ impo~ impo~ impo~ not ~ not im~
-    ## 10      1999 AUS      10327    57.2 impo~ impor~ impo~ impo~ impo~ impo~ import~
-    ## # ... with 329,125 more rows, and 12 more variables: respect <fct>, news <fct>,
-    ## #   protest <fct>, discuss <fct>, party <fct>, female <dbl>, books <dbl>,
-    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##    ICCS_year COUNTRY IDSTUD TOTWGTS obey  rights local work  envir vote 
+    ##        <int> <chr>    <dbl>   <dbl> <fct> <fct>  <fct> <fct> <fct> <fct>
+    ##  1      1999 AUS      10302    57.2 impo… not i… impo… impo… impo… impo…
+    ##  2      1999 AUS      10305    57.2 impo… not i… impo… impo… impo… impo…
+    ##  3      1999 AUS      10311    57.2 impo… <NA>   <NA>  impo… impo… not …
+    ##  4      1999 AUS      10313    57.2 impo… not i… not … not … not … impo…
+    ##  5      1999 AUS      10317    57.2 impo… impor… impo… not … impo… not …
+    ##  6      1999 AUS      10319    57.2 impo… impor… impo… impo… impo… impo…
+    ##  7      1999 AUS      10324    57.2 impo… impor… impo… impo… impo… impo…
+    ##  8      1999 AUS      10325    57.2 impo… <NA>   impo… impo… impo… impo…
+    ##  9      1999 AUS      10326    57.2 impo… impor… impo… impo… impo… not …
+    ## 10      1999 AUS      10327    57.2 impo… impor… impo… impo… impo… impo…
+    ## # … with 329,125 more rows, and 13 more variables: history <fct>,
+    ## #   respect <fct>, news <fct>, protest <fct>, discuss <fct>, party <fct>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>,
+    ## #   id <int>, id2 <chr>
 
 ## Tables:
 
@@ -1978,7 +1729,7 @@ Means of citizenship norm indicators by country and year.
 # count and percent of responses to "obey" grouped by year
 means <- tbl %>%
   group_by(COUNTRY, ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, funs(round(mean(., na.rm = TRUE), 3)))
+  summarize_at(cit_norm_indicators, list(~round(mean(., na.rm = TRUE), 3)))
 
 means %>% 
   knitr::kable()
@@ -2084,7 +1835,7 @@ year.
 missing <- tbl %>% 
   group_by(COUNTRY, ICCS_year) %>% 
   summarize_at(cit_norm_indicators,
-               funs(paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
+               list(~paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
 
 missing %>% 
   knitr::kable()
@@ -2183,7 +1934,8 @@ missing %>%
 | TWN     |       2016 | 11 (0.28%)   | 11 (0.28%)   | 10 (0.25%)   | 11 (0.28%)   | 12 (0.3%)    | 10 (0.25%)  | 17 (0.43%)   | 12 (0.3%)    | 10 (0.25%)   | 16 (0.4%)    | 13 (0.33%)   | 13 (0.33%)   |
 | USA     |       1999 | 98 (3.49%)   | 209 (7.44%)  | 141 (5.02%)  | 131 (4.66%)  | 186 (6.62%)  | 123 (4.38%) | 158 (5.62%)  | 162 (5.76%)  | 193 (6.87%)  | 355 (12.63%) | 307 (10.92%) | 259 (9.21%)  |
 
-Write to excel: cit noms means and missings tables.
+Write to excel: cit noms means and missings
+tables.
 
 ``` r
 write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indicator-tables.xlsx")
@@ -2206,7 +1958,7 @@ all_wave_countries <- tbl %>%
 plot_tbl <- tbl %>% 
   filter(COUNTRY %in% all_wave_countries) %>% 
   group_by(ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, funs(t.test(.) %>%
+  summarize_at(cit_norm_indicators, list(~t.test(.) %>%
                                            broom::tidy() %>%
                                            mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
                                            pull(mean_ci))) %>% 
@@ -2426,17 +2178,17 @@ stata_tbl %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
-    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
-    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA       1
-    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0       0
-    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0       1
-    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1       1
-    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0       0
-    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1       1
-    ## # ... with 12 more variables: respect <int>, news <int>, protest <int>,
-    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
-    ## #   ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>
+    ## 1      1999 BGR      70612    19.7     1      1    NA    NA    NA    NA
+    ## 2      1999 BGR     100301    18.0     1      1     0     1     1     0
+    ## 3      1999 BGR     100303    18.0     0      0     0     1     0     0
+    ## 4      1999 BGR     100311    18.0     1      1     0     1     1     1
+    ## 5      1999 BGR     160619    11.8     0      0     0     0     0     0
+    ## 6      1999 BGR     300320    41.4     0      1     1     1     1     1
+    ## # … with 13 more variables: history <int>, respect <int>, news <int>,
+    ## #   protest <int>, discuss <int>, party <int>, female <dbl>, books <dbl>,
+    ## #   edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>, id <int>, id2 <chr>
 
 ``` r
 stata_tbl14 <- stata_tbl %>%
@@ -2468,17 +2220,17 @@ stata_tbl14 %>% head()
 ```
 
     ## # A tibble: 6 x 23
-    ##   ICCS_year COUNTRY IDSTUD    id id2   TOTWGTS  obey rights local  work envir
-    ##       <int> <chr>    <dbl> <int> <chr>   <dbl> <int>  <int> <int> <int> <int>
-    ## 1      1999 BGR      70612  5408 BGR7~    19.7     1      1    NA    NA    NA
-    ## 2      1999 BGR     100301  5409 BGR1~    18.0     1      1     0     1     1
-    ## 3      1999 BGR     100303  5410 BGR1~    18.0     0      0     0     1     0
-    ## 4      1999 BGR     100311  5411 BGR1~    18.0     1      1     0     1     1
-    ## 5      1999 BGR     160619  5412 BGR1~    11.8     0      0     0     0     0
-    ## 6      1999 BGR     300320  5413 BGR3~    41.4     0      1     1     1     1
-    ## # ... with 12 more variables: vote <int>, history <int>, respect <int>,
-    ## #   news <int>, protest <int>, discuss <int>, party <int>, female <dbl>,
-    ## #   books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
+    ##   ICCS_year COUNTRY IDSTUD    id id2   TOTWGTS  obey rights local  work
+    ##       <int> <chr>    <dbl> <int> <chr>   <dbl> <int>  <int> <int> <int>
+    ## 1      1999 BGR      70612  5408 BGR7…    19.7     1      1    NA    NA
+    ## 2      1999 BGR     100301  5409 BGR1…    18.0     1      1     0     1
+    ## 3      1999 BGR     100303  5410 BGR1…    18.0     0      0     0     1
+    ## 4      1999 BGR     100311  5411 BGR1…    18.0     1      1     0     1
+    ## 5      1999 BGR     160619  5412 BGR1…    11.8     0      0     0     0
+    ## 6      1999 BGR     300320  5413 BGR3…    41.4     0      1     1     1
+    ## # … with 13 more variables: envir <int>, vote <int>, history <int>,
+    ## #   respect <int>, news <int>, protest <int>, discuss <int>, party <int>,
+    ## #   female <dbl>, books <dbl>, edexp <dbl>, ed_mom <dbl>, ed_dad <dbl>
 
 ``` r
 haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
@@ -2489,7 +2241,9 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 View count of immigration var for recode
 
 ``` r
-tbl_belg2016 <- load_files("../data/37147-0064-Data.rda")
+tbl_belg2016 <- load_files("../data/37147-0064-Data.rda") %>% 
+  as_tibble() %>% 
+  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
 ```
 
 \*\*NONNATIVEBORN View count frequencies of IS3G04A variable (country of
@@ -2498,11 +2252,9 @@ chunk: “Factor `IS3G04A` contains implicit NA, consider using
 `forcats::fct_explicit_na`”
 
 ``` r
-tbl_belg2016 %>% count(IS3G04A)
+tbl_belg2016 %>%
+  count(IS3G04A)
 ```
-
-    ## Warning: Factor `IS3G04A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## # A tibble: 3 x 2
     ##   IS3G04A                                     n
@@ -2525,11 +2277,8 @@ Confirm “nonnativeborn” recode is correct
 
 ``` r
 tbl_belg2016  %>% 
-  count (IS3G04A, nonnativeborn)
+  count(IS3G04A, nonnativeborn)
 ```
-
-    ## Warning: Factor `IS3G04A` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## # A tibble: 3 x 3
     ##   IS3G04A                                 nonnativeborn     n
@@ -2557,9 +2306,6 @@ dat output as “.”
 ``` r
 tbl_belg2016 %>% count(S_IMMIG)
 ```
-
-    ## Warning: Factor `S_IMMIG` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
 
     ## # A tibble: 4 x 2
     ##   S_IMMIG                                                      n
@@ -2589,23 +2335,20 @@ Confirm “immigrantfam” recode is correct
 
 ``` r
 tbl_belg2016  %>% 
-  count (S_IMMIG, immigrantfam)
+  count(S_IMMIG, immigrantfam)
 ```
 
-    ## Warning: Factor `S_IMMIG` contains implicit NA, consider using
-    ## `forcats::fct_explicit_na`
-
     ## # A tibble: 4 x 3
-    ##   S_IMMIG                                                  immigrantfam     n
-    ##   <fct>                                                           <dbl> <int>
-    ## 1 "(1) \tAt least one parent born in country"                         0  2437
-    ## 2 "(2) Students born in country but parent(s) born abroad"            0   217
-    ## 3 "(3) Students and parent(s) born abroad"                            1   189
-    ## 4  <NA>                                                              NA    88
+    ##   S_IMMIG                                                immigrantfam     n
+    ##   <fct>                                                         <dbl> <int>
+    ## 1 "(1) \tAt least one parent born in country"                       0  2437
+    ## 2 "(2) Students born in country but parent(s) born abro…            0   217
+    ## 3 "(3) Students and parent(s) born abroad"                          1   189
+    ## 4  <NA>                                                            NA    88
 
 ``` r
 tbl_belg2016  %>% 
-  count (immigrantfam)
+  count(immigrantfam)
 ```
 
     ## # A tibble: 3 x 2
