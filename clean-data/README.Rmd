@@ -901,6 +901,8 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 ```
 
 
+## Preparing 2016 all-country data with additional variables for 2-step analysis
+
 2016 example recode of new specific variables using 1 country rda file (Belgium)
 
 View count of immigration var for recode
@@ -1022,7 +1024,41 @@ tbl_allcountries_2016_2step <- files %>%
 ```
 
 
-Recodes
+Cit norm, count all indicators to begin recode.
+
+```{r}
+
+original_vars <- tbl_allcountries_2016_2step %>% 
+  select(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B) %>% 
+  colnames() 
+
+original_vars %>% 
+  map(~ tbl_allcountries_2016_2step %>% count(!!sym(.x)))
+```
+
+Recode all cit norm indicators. 
+
+```{r}
+
+tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
+  mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
+            list(bin = ~fct_collapse(.,
+                                    "not important" = c("(3) Not very important", "(4) Not important at all"),
+                                    "important"     = c("(1) Very important", "(2) Quite important")))
+  )
+```
+
+Confirm successful cit norm mutates.
+
+```{r}
+
+bin_vars <- original_vars %>% 
+  paste0("_bin")
+
+map2(original_vars, bin_vars, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
+```
+
+Recode of individual-level control vars
 
 ```{r}
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
@@ -1075,6 +1111,15 @@ recoded_vars_2step  <- c("female", "books", "edexp", "ed_mom", "ed_dad", "nonnat
 map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
 ```
 
+Read in GDP data downloaded from IMF on 8 April, 2020 from source: 
+https://www.imf.org/external/pubs/ft/weo/2018/02/weodata/index.aspx 
+Manual download documentation: 
+**Clicked on: "Download WEO Data: October 2018 Edition" --> "By countries" --> "All countries"
+**Downloaded 1st file: "Gross domestic product per capita, constant prices - Purchasing power parity; 2011 international dollars"
+**Downloaded 2nd file: "Gross domestic product per capita, current prices U.S. dollars"
+Year range: 1998 - 2016
+**The resulting xlsx saved in github "data" folder  has 3 worksheets: 1st documents data; 2nd is GDP in constant ppp 2011; 3rd is GDP current prices US.
+
 QQ add here code for creating 4 GDP variables:
   gdp_constant
   log_gdp_constant
@@ -1082,12 +1127,10 @@ QQ add here code for creating 4 GDP variables:
   log_gdp_currentusd
 
 ```{r}
-# Install some version of an xls reading package, e.g., 
-# install.packages("readxl")
+# Install xls reading package
 library(readxl)
 
-# Import xlsx that I already have downloaded & saved to github data folder
-# Note: this xlsx has 3 worksheets: 1st documents data, 2nd is GDP in constant ppp 2011; 3rd is GDP current prices US. We can view these using the `excel_sheets()` function from readxl
+# Import xlsx
 readxl::excel_sheets("../data/GDP data downloaded from IMF_3worksheets_Apr2020.xlsx")
 
 # Read in worksheet: “GDP constant ppp 2011; intl$”
@@ -1138,25 +1181,26 @@ tbl_allcountries_2016_2step %>% head()
 ```
 
 
-Select for vars to prepare for export.  In the below, need to swap out BS3 variables with IS3 variables in the `tbl_allcountries_2016_2step` data.
+Select for vars to prepare for export.  
+```{r}
 
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
   select(ICCS_year,
          COUNTRY,
          IDSTUD,
-         TOTWGTS = TOTWGT,
-         obey    = BS3B1_bin,
-         rights  = BS3B11_bin,
-         local   = BS3B9_bin,
-         work    = BS3B4_bin,
-         envir   = BS3B13_bin,
-         vote    = BS3B2_bin,
-         history = BS3B6_bin,
-         respect = BS3B10_bin,
-         news    = BS3B8_bin,
-         protest = BS3B5_bin,
-         discuss = BS3B12_bin,
-         party   = BS3B3_bin,
+         TOTWGTS,
+         obey    = IS3G23L_bin,
+         rights  = IS3G23I_bin,
+         local   = IS3G23H_bin,
+         work    = IS3G23K_bin,
+         envir   = IS3G23J_bin,
+         vote    = IS3G23A_bin,
+         history = IS3G23C_bin,
+         respect = IS3G23E_bin,
+         news    = IS3G23D_bin,
+         protest = IS3G23G_bin,
+         discuss = IS3G23F_bin,
+         party   = IS3G23B_bin,
          female,
          books,
          edexp,
@@ -1169,3 +1213,11 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          log_gdp_constant,
          gdp_currentusd,
          log_gdp_currentusd)
+```
+
+
+```{r}
+
+write_delim(tbl_allcountries_2016_2step, "output/tbl_allcountries_2016_2step.dat", delim = ",")
+
+```
