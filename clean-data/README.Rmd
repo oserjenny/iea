@@ -1058,6 +1058,9 @@ bin_vars <- original_vars %>%
 map2(original_vars, bin_vars, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
 ```
 
+
+
+
 Recode of individual-level control vars
 
 ```{r}
