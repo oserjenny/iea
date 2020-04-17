@@ -7,14 +7,14 @@ April, 2020
 library(tidyverse)
 ```
 
-    ## -- Attaching packages --------------------------------------------------- tidyverse 1.3.0 --
+    ## -- Attaching packages ---------------------------------------------------- tidyverse 1.3.0 --
 
     ## v ggplot2 3.3.0     v purrr   0.3.3
     ## v tibble  2.1.3     v dplyr   0.8.5
     ## v tidyr   1.0.2     v stringr 1.4.0
     ## v readr   1.3.1     v forcats 0.5.0
 
-    ## -- Conflicts ------------------------------------------------------ tidyverse_conflicts() --
+    ## -- Conflicts ------------------------------------------------------- tidyverse_conflicts() --
     ## x dplyr::filter() masks stats::filter()
     ## x dplyr::lag()    masks stats::lag()
 
@@ -1281,7 +1281,7 @@ Recode of individual-level control vars
 
 ``` r
 tbl3 <- tbl3 %>% 
-  mutate(female = ifelse(S_GENDER == "(0) BOY", 0, 1),   # gender
+  mutate(female = ifelse(S_GENDER == "(0) Boy", 0, 1),   # gender
          books = case_when(                              # books in respondent's home
            IS3G11 == "(1) None or very few (0–10 books)"                                ~ 0,
            IS3G11 == "(2) Enough to fill one shelf (11–25 books)"                       ~ 1,
@@ -1321,7 +1321,7 @@ map2(recoded_vars, sociodem_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
     ## # A tibble: 3 x 3
     ##   female S_GENDER     n
     ##    <dbl> <fct>    <int>
-    ## 1      1 (0) Boy  47674
+    ## 1      0 (0) Boy  47674
     ## 2      1 (1) Girl 46903
     ## 3      1 <NA>        26
     ## 
@@ -2665,7 +2665,7 @@ Recode of individual-level control vars
 
 ``` r
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
-  mutate(female = ifelse(S_GENDER == "(0) BOY", 0, 1),   # gender
+  mutate(female = ifelse(S_GENDER == "(0) Boy", 0, 1),   # gender
          books = case_when(                              # books in respondent's home
            IS3G11 == "(1) None or very few (0–10 books)"                                ~ 0,
            IS3G11 == "(2) Enough to fill one shelf (11–25 books)"                       ~ 1,
@@ -2718,7 +2718,7 @@ map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% 
     ## # A tibble: 3 x 3
     ##   female S_GENDER     n
     ##    <dbl> <fct>    <int>
-    ## 1      1 (0) Boy  47674
+    ## 1      0 (0) Boy  47674
     ## 2      1 (1) Girl 46903
     ## 3      1 <NA>        26
     ## 
@@ -2949,6 +2949,45 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          gdp_currentusd,
          log_gdp_currentusd)
 ```
+
+Convert citizenship norm indicators to integer (0 = “not important”, 1 =
+“important”) in preparation for LG export
+
+``` r
+cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
+
+tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
+  mutate_at(cit_norm_indicators,
+            list( ~ case_when(
+              . == "not important" ~ 0L,
+              . == "important"     ~ 1L,
+              TRUE~NA_integer_
+            ))
+  ) %>% 
+  mutate_at(vars(ICCS_year), as.integer) %>% 
+  mutate(COUNTRY = as.character(COUNTRY))
+
+ 
+tbl_allcountries_2016_2step %>% head()
+```
+
+    ## # A tibble: 6 x 28
+    ##   ICCS_year COUNTRY IDSTUD TOTWGTS  obey rights local  work envir  vote history
+    ##       <int> <chr>    <dbl>   <dbl> <int>  <int> <int> <int> <int> <int>   <int>
+    ## 1      2016 BFL     1.00e7    22.5     1      1     1     1     1     1       0
+    ## 2      2016 BFL     1.00e7    22.5     1      1     1     1     1     1       0
+    ## 3      2016 BFL     1.00e7    22.5     1      1     1     1     1     1       0
+    ## 4      2016 BFL     1.00e7    22.5     1      1     1     1     1     1       1
+    ## 5      2016 BFL     1.00e7    22.5     1      1     1     1     1     1       0
+    ## 6      2016 BFL     1.00e7    22.5     1      1     1     1     1     0       0
+    ## # ... with 17 more variables: respect <int>, news <int>, protest <int>,
+    ## #   discuss <int>, party <int>, female <dbl>, books <dbl>, edexp <dbl>,
+    ## #   ed_mom <dbl>, ed_dad <dbl>, nonnat_born <dbl>, immigrantfam <dbl>,
+    ## #   nonnat_lang <dbl>, gdp_constant <dbl>, log_gdp_constant <dbl>,
+    ## #   gdp_currentusd <dbl>, log_gdp_currentusd <dbl>
+
+View how NA represented QQ: how possible to view more than 1st 5 lines
+of dataframe?
 
 ``` r
 write_delim(tbl_allcountries_2016_2step, "output/tbl_allcountries_2016_2step.dat", delim = ",")
