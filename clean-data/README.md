@@ -2986,8 +2986,7 @@ tbl_allcountries_2016_2step %>% head()
     ## #   nonnat_lang <dbl>, gdp_constant <dbl>, log_gdp_constant <dbl>,
     ## #   gdp_currentusd <dbl>, log_gdp_currentusd <dbl>
 
-View how NA represented QQ: how possible to view more than 1st 5 lines
-of dataframe?
+View
 
 ``` r
 write_delim(tbl_allcountries_2016_2step, "output/tbl_allcountries_2016_2step.dat", delim = ",")

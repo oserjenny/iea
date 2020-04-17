@@ -1237,8 +1237,7 @@ tbl_allcountries_2016_2step %>% head()
 ```
 
 
-View how NA represented
-QQ: how possible to view more than 1st 5 lines of dataframe?
+View 
 
 ```{r, include=FALSE}
 head(tbl_allcountries_2016_2step) %>% View
