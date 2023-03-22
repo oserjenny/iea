@@ -64,7 +64,10 @@ tbl1 <- files %>%
   select(`ICCS_year`, everything())
 
 tbl1 <- tbl1 %>%
-	mutate_if(is.factor, fct_explicit_na)
+	mutate(
+	  across(where(is.factor), fct_explicit_na)
+	)
+	 
 ```
 
 
@@ -96,6 +99,7 @@ tbl1 <- tbl1 %>%
 # confirm correct recode
 tbl1 %>%
   count(BS3B1, BS3B1_binary) 
+
 ```
 
 
@@ -104,11 +108,15 @@ Repeat for all cit norm indicators. NOTE: BS3B12 recoded separately below b/c of
 ```{r}
 
 tbl1 <-tbl1 %>% 
-  mutate_at(vars(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B3),
-            list(bin = ~fct_collapse(.,
-                                    "not important"= c("(1) not important", "(2) somewhat unimportant"),
-                                    "important"    = c("(3) somewhat important", "(4) very important")))
+  mutate(
+    across(c(BS3B1, BS3B11, BS3B9, BS3B4, BS3B13, BS3B2, BS3B6, BS3B10, BS3B8, BS3B5, BS3B3),
+           ~fct_collapse(.x,
+                         "not important"= c("(1) not important", "(2) somewhat unimportant"),
+                         "important"    = c("(3) somewhat important", "(4) very important")),
+           .names = "{.col}_bin"
+           )
   )
+
 ```
 
 BS3B12 error troubleshoot when included in prior chunk. 
@@ -126,6 +134,7 @@ tbl1 <- tbl1 %>%
                                    "not important" = c("(1) not importnat", "(2) somewhat unimportant"),
                                    "important"     = c("(3) somewhat important", "(4) very important"))
   )
+
 ```
 
 Confirm successful mutates for all cit norms indicators.
@@ -136,6 +145,7 @@ bin_vars <- original_vars %>%
   paste0("_bin")
 
 map2(original_vars, bin_vars, ~ tbl1 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Recode of individual-level control vars
@@ -185,6 +195,7 @@ sociodem_vars <- c("GENDER", "BSGBOOK", "EXPEDUC", "BSGEDUM", "BSGEDUF")
 recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 
 map2(recoded_vars, sociodem_vars, ~ tbl1 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Select for LCA vars tibble, including rename all mutated variables and display first five lines of dataframe.
@@ -215,6 +226,7 @@ tbl1 <- tbl1 %>%
          ed_dad)
 
 tbl1 %>% head()
+
 ```
 
 
@@ -232,13 +244,19 @@ tbl2 <- files %>%
   magrittr::extract(29:66) %>%      # filter to 2009 files only
   map(~ .x %>%
         load_files() %>%
-        select(COUNTRY, IDCNTRY, IDSTUD, IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A,
-               IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B, SGENDER, IS2G11, IS2G03, IS2G07, IS2G09, TOTWGTS)) %>% 
+        select(COUNTRY, IDCNTRY, IDSTUD, IS2P21L, IS2P21I, IS2P21H, IS2P21K, 
+               IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, 
+               IS2P21F, IS2P21B, SGENDER, IS2G11, IS2G03, IS2G07, IS2G09, 
+               TOTWGTS)) %>% 
   reduce(rbind) %>% 
   as_tibble() %>% 
   mutate(`ICCS_year` = 2009) %>%     # survey year variable creation
   select(`ICCS_year`, everything()) %>% 
-  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
+  mutate(
+    across(where(is.factor), 
+           ~fct_explicit_na(.x, na_level = NA))
+    )
+
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -251,6 +269,7 @@ original_vars <- tbl2 %>%
 
 original_vars %>% 
   map(~ tbl2 %>% count(!!sym(.x)))
+
 ```
 
 Recode all cit norm indicators. 
@@ -258,11 +277,15 @@ Recode all cit norm indicators.
 ```{r}
 
 tbl2 <- tbl2 %>% 
-  mutate_at(vars(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A, IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B),
-            list(bin = ~fct_collapse(.,
-                                    "not important" = c("(3) NOT VERY IMPORTANT", "(4) NOT IMPORTANT AT ALL"),
-                                    "important"     = c("(1) VERY IMPORTANT", "(2) QUITE IMPORTANT")))
+  mutate(
+    across(c(IS2P21L, IS2P21I, IS2P21H, IS2P21K, IS2P21J, IS2P21A,
+             IS2P21C, IS2P21E, IS2P21D, IS2P21G, IS2P21F, IS2P21B),
+           ~fct_collapse(.x,
+                         "not important" = c("(3) NOT VERY IMPORTANT", "(4) NOT IMPORTANT AT ALL"),
+                         "important"     = c("(1) VERY IMPORTANT", "(2) QUITE IMPORTANT")),
+           .names = "{col}_bin")
   )
+
 ```
 
 Confirm successful recodes.
@@ -273,6 +296,7 @@ bin_vars <- original_vars %>%
   paste0("_bin")
 
 map2(original_vars, bin_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Recode of individual-level control vars
@@ -318,6 +342,7 @@ sociodem_vars <- c("SGENDER", "IS2G11", "IS2G03", "IS2G07", "IS2G09")
 recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 
 map2(recoded_vars, sociodem_vars, ~ tbl2 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 
@@ -372,7 +397,11 @@ tbl3 <- files %>%
   as_tibble()%>% 
   mutate(`ICCS_year` = 2016) %>%    # create survey year variable
   select(`ICCS_year`, everything()) %>% 
-  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
+  mutate(
+    across(where(is.factor), 
+           ~fct_explicit_na(.x, na_level = NA))
+    )
+
 ```
 
 Cit norm, count all indicators to begin recode.
@@ -387,17 +416,20 @@ original_vars %>%
   map(~ tbl3 %>% count(!!sym(.x)))
 ```
 
-
 Recode all cit norm indicators. 
 
 ```{r}
 
 tbl3 <- tbl3 %>% 
-  mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
-            list(bin = ~fct_collapse(.,
+  mutate(
+    across(c(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, 
+             IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
+           ~fct_collapse(.x,
                                     "not important" = c("(3) Not very important", "(4) Not important at all"),
-                                    "important"     = c("(1) Very important", "(2) Quite important")))
+                                    "important"     = c("(1) Very important", "(2) Quite important")),
+           .names = "{col}_bin")
   )
+
 ```
 
 Confirm successful mutates.
@@ -408,6 +440,7 @@ bin_vars <- original_vars %>%
   paste0("_bin")
 
 map2(original_vars, bin_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Recode of individual-level control vars
@@ -449,6 +482,7 @@ sociodem_vars <- c("S_GENDER", "IS3G11", "IS3G03", "IS3G07", "IS3G09")
 recoded_vars  <- c("female", "books", "edexp", "ed_mom", "ed_dad")
 
 map2(recoded_vars, sociodem_vars, ~ tbl3 %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Select for LCA vars tibble, including rename all mutated variables and display first five lines of dataframe.
@@ -479,6 +513,7 @@ tbl3 <- tbl3 %>%
          ed_dad)
 
 tbl3 %>% head()
+
 ```
 
 
@@ -491,6 +526,7 @@ Combine the three data frames and create unique id per observation across binded
 tbl <- rbind(tbl1, tbl2, tbl3) %>% 
   mutate(id  = row_number(),
          id2 = paste0(COUNTRY, IDSTUD))
+
 ```
 
 Check number of observations by survey year of the combined data frame.
@@ -500,6 +536,7 @@ Check number of observations by survey year of the combined data frame.
 tbl %>% 
   count(ICCS_year) %>% 
   knitr::kable()
+
 ```
 
 
@@ -509,20 +546,22 @@ Before exporting, convert citizenship norm indicators to integer (0 = "not impor
 
 ```{r}
 
-cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
-
 tbl <- tbl %>% 
-  mutate_at(cit_norm_indicators,
-            list( ~ case_when(
-              . == "not important" ~ 0L,
-              . == "important"     ~ 1L,
-              TRUE~NA_integer_
-            ))
+  mutate(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~ case_when(
+             .x == "not important" ~ 0L,
+             .x == "important"     ~ 1L,
+             TRUE~NA_integer_
+           ))
   ) %>% 
-  mutate_at(vars(ICCS_year), as.integer) %>% 
-  mutate(COUNTRY = as.character(COUNTRY))
+  mutate(
+    ICCS_year = as.integer(ICCS_year),
+    COUNTRY   = as.character(COUNTRY))
 
 tbl %>% head()
+
 ```
 
 
@@ -540,6 +579,7 @@ write_delim(tbl, "output/tbl_allcountries_3waves.dat", delim = ",")
 Export single dat file for 14 countries that participate in all 3 time points:
 
 ```{r}
+
 # Select for countries in all 3 waves only
 
 all_wave_countries <- tbl %>%
@@ -549,6 +589,7 @@ all_wave_countries <- tbl %>%
   pull(COUNTRY)
 
 all_wave_countries %>% head()
+
 ```
 
 ```{r}
@@ -629,6 +670,7 @@ write_delim(tbl14countries_2016, "output/tbl14countries_2016.dat", delim = ",")
 Separate country-year .dat files for all countries, all 3 time points:
 
 ```{r}
+
 tbl %>% 
   mutate(country_year = paste0(COUNTRY, "-", ICCS_year)) %>% 
   group_by(country_year) %>% 
@@ -642,8 +684,10 @@ Attach factor labels to the citizenship norm indicators for internal use in R (b
 ```{r}
 
 example <- tbl %>% 
-  mutate_at(cit_norm_indicators,
-            list(~haven::labelled(., labels = c("not important" = 0, "important" = 1))))
+  mutate(
+    across(c(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party),
+            ~haven::labelled(.x, labels = c("not important" = 0, "important" = 1)))
+    )
 
 # cit norm indicator vars are now int+lbl type
 example %>% 
@@ -651,12 +695,16 @@ example %>%
 
 # access labels by converting those vars to factors
 example %>% 
-  mutate_at(cit_norm_indicators, list(~as_factor(.)))
+  mutate(
+    across(c(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party),
+           ~as_factor(.x)
+           )
+  )
+
 ```
 
 
 ## Tables:
-
 
 Means of citizenship norm indicators by country and year.
 
@@ -665,10 +713,18 @@ Means of citizenship norm indicators by country and year.
 # count and percent of responses to "obey" grouped by year
 means <- tbl %>%
   group_by(COUNTRY, ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, list(~round(mean(., na.rm = TRUE), 3)))
+  summarize(
+    across(
+      c(obey, rights, local, work, envir, vote, history, 
+        respect, news, protest, discuss, party), 
+      ~round(mean(.x, na.rm = TRUE), 3)
+    ),
+    .groups = "drop"
+  )
 
 means %>% 
   knitr::kable()
+
 ```
 
 Count and percentage of missing values for each indicator by country and year.
@@ -677,11 +733,16 @@ Count and percentage of missing values for each indicator by country and year.
 
 missing <- tbl %>% 
   group_by(COUNTRY, ICCS_year) %>% 
-  summarize_at(cit_norm_indicators,
-               list(~paste0(sum(is.na(.)), " (", (round(sum(is.na(.)) / length(.) * 100, 2)), "%)")))
+  summarize(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~paste0(sum(is.na(.x)), " (", (round(sum(is.na(.x)) / length(.) * 100, 2)), "%)")),
+    .groups = "drop"
+  )
 
 missing %>% 
   knitr::kable()
+
 ```
 
 
@@ -690,6 +751,7 @@ Write to excel: cit noms means and missings tables.
 ```{r}
 
 write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indicator-tables.xlsx")
+
 ```
 
 
@@ -700,6 +762,7 @@ write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indi
 First, create the table to be used for plotting.
 
 ```{r}
+
 all_wave_countries <- tbl %>%
   count(COUNTRY, ICCS_year) %>% 
   count(COUNTRY) %>%
@@ -710,10 +773,13 @@ all_wave_countries <- tbl %>%
 plot_tbl <- tbl %>% 
   filter(COUNTRY %in% all_wave_countries) %>% 
   group_by(ICCS_year) %>% 
-  summarize_at(cit_norm_indicators, list(~t.test(.) %>%
-                                           broom::tidy() %>%
-                                           mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
-                                           pull(mean_ci))) %>% 
+  summarize(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~t.test(.x) %>% 
+             broom::tidy() %>%
+             mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
+             pull(mean_ci))) %>% 
   gather(Indicator, value, -ICCS_year) %>% 
   mutate(value = str_split(value, " "),
          cols = map(value, ~ data.frame(t(.)))) %>% 
@@ -725,12 +791,12 @@ plot_tbl <- tbl %>%
   select(-c(X1, X2, X3))
 
 plot_tbl %>% 
-  mutate_if(is.numeric, round, 3) %>% 
+  mutate(
+    across(where(is.numeric), ~round(.x, 3))
+    ) %>% 
   knitr::kable()
 
 ```
-
-
 
 Line plots:
 
@@ -746,6 +812,7 @@ plot_tbl %>%
   labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") 
 
 ggsave("output/mean-citizenship-norm-line-plot-by-year.png")
+
 ```
 
 Black and white: add the `theme_bw()` option at the end, and change the "color" aesthetic to `lty` to give a different line type for each `Indicator`.
@@ -777,12 +844,14 @@ plot_tbl %>%
   theme(legend.position = "none")
 
 ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+
 ```
 
 
 Facet wrap with improved interpretability, including consistent y-axis, and re-ordering to highest mean top left
 
 ```{r line-plots-facet-4}
+
 # line plot with year on x-axis, lines colored by indicator type
 barplot_tbl<- plot_tbl %>% 
     mutate(Indicator=fct_relevel(Indicator,c("obey", "rights", "local", "work", "envir", "vote", "history", "respect", "news", "protest", "discuss", "party"))) 
@@ -798,6 +867,7 @@ barplot_tbl %>%
   scale_x_continuous(breaks=c(1999, 2009, 2016))
 
 ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+
 ```
 
 
@@ -816,12 +886,14 @@ plot_tbl %>%
   labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year")
 
 ggsave("output/mean-citizenship-norm-bar-plot-by-indicator.png")
+
 ```
 
 
 Bar plots of 14 countries in all 3 time periods, black and white:
 
 ```{r}
+
 # bar plot with indicators on x-axis, lines colored by year
 plot_tbl %>% 
   mutate(Year      = as.factor(ICCS_year),
@@ -834,14 +906,13 @@ plot_tbl %>%
   theme_bw() + scale_fill_grey()
 
 ggsave("output/14cntry-mean-citizenship-norm-bar-plot-by-indicator-bw.png")
+
 ```
-
-
-
 
 Export tbl to stata to add to replication files
 
 ```{r}
+
 # Select for countries in all 3 waves only
 
 all_wave_countries <- tbl %>%
@@ -851,19 +922,22 @@ all_wave_countries <- tbl %>%
   pull(COUNTRY)
 
 all_wave_countries %>% head()
+
 ```
 
 ```{r}
+
 # Filter by countries in all 3 waves
 
 stata_tbl <- tbl %>% 
   filter(COUNTRY %in% all_wave_countries)
 
-
 stata_tbl %>% head()
+
 ```
 
 ```{r}
+
 stata_tbl14 <- stata_tbl %>%
   select(ICCS_year,
          COUNTRY,
@@ -905,49 +979,65 @@ haven::write_dta(stata_tbl14, "output/citnormscoded.dta")
 
 2016 example recode of new specific variables using 1 country rda file (Belgium)
 
-View count of immigration var for recode
+View count of immigration var for recode.
+
 ```{r}
+
 tbl_belg2016 <- load_files("../data/37147-0064-Data.rda") %>% 
   as_tibble() %>% 
-  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
+  mutate(
+    across(where(is.factor), 
+           ~fct_explicit_na(.x, na_level = NA))
+    )
 
 ```
 
 **NONNATIVEBORN
+
 View count frequencies of IS3G04A variable (country of birth) for recode
 
-
 ```{r}
+
 tbl_belg2016 %>%
   count(IS3G04A)
 
 ```
 
 Do recode of IS3G04A var --> "nonnat_born"
+
 ```{r}
+
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(nonnat_born = case_when(
     IS3G04A == "(0) Other"                                ~ 1,
     IS3G04A == "(1) Country of birth is country of test"  ~ 0
   ))
+
 ```
 
 Confirm "nonnat_born" recode is correct
+
 ```{r}
+
 tbl_belg2016  %>% 
   count(IS3G04A, nonnat_born)
+
 ```
 
 ```{r}
+
 tbl_belg2016  %>% 
   count (nonnat_born)
+
 ```
 
 
 **IMMIGRANTFAM
+
 View count frequencies of S_IMMIG variable (country of birth) for recode
 
 ```{r}
+
 tbl_belg2016 %>% count(S_IMMIG)
 
 ```
@@ -961,23 +1051,30 @@ Note: distinction between "nonnativeborn" and "immigrantfam":
 thus "immigrantfam" is likely to be a smaller and more "foreign" subset of sample
 
 ```{r}
+
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(immigrantfam = case_when(
     S_IMMIG == "(1) \tAt least one parent born in country"               ~ 0,
     S_IMMIG == "(2) Students born in country but parent(s) born abroad"  ~ 0,
     S_IMMIG == "(3) Students and parent(s) born abroad"                  ~ 1,
   ))
+
 ```
 
 Confirm "immigrantfam" recode is correct
+
 ```{r}
+
 tbl_belg2016  %>% 
   count(S_IMMIG, immigrantfam)
+
 ```
 
 ```{r}
+
 tbl_belg2016  %>% 
   count(immigrantfam)
+
 ```
 
 
@@ -986,30 +1083,36 @@ tbl_belg2016  %>%
 ```{r}
 
 tbl_belg2016 %>% count(IS3G05)
+
 ```
 
 
 Do recode of IS3G05 var –> “nonnat_lang” 
 
 ```{r}
+
 tbl_belg2016 <- tbl_belg2016 %>%
   mutate(nonnat_lang = case_when(
     IS3G05 == "(0) Other"                                 ~ 1,
     IS3G05 == "(1) Language at home is language of test"  ~ 0,
     ))
+
 ```
 
 Confirm “nonnativeborn” recode is correct
 
 ```{r}
+
 tbl_belg2016  %>% 
   count(IS3G05, nonnat_lang)
+
 ```
 
 
 Load all 2016 countries to select for previously coded variables along with these new ones
 
 ```{r}
+
 tbl_allcountries_2016_2step <- files %>%
   magrittr::extract(67:90) %>%      # filter to 2016 files only
   map(~ .x %>%
@@ -1020,9 +1123,12 @@ tbl_allcountries_2016_2step <- files %>%
   as_tibble()%>% 
   mutate(`ICCS_year` = 2016) %>%    # create survey year variable
   select(`ICCS_year`, everything()) %>% 
-  mutate_if(is.factor, list(~forcats::fct_explicit_na(., na_level = NA)))
-```
+  mutate(
+    across(where(is.factor), 
+           ~fct_explicit_na(.x, na_level = NA))
+    )
 
+```
 
 Cit norm, count all indicators to begin recode.
 
@@ -1034,6 +1140,7 @@ original_vars <- tbl_allcountries_2016_2step %>%
 
 original_vars %>% 
   map(~ tbl_allcountries_2016_2step %>% count(!!sym(.x)))
+
 ```
 
 Recode all cit norm indicators. 
@@ -1041,11 +1148,15 @@ Recode all cit norm indicators.
 ```{r}
 
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
-  mutate_at(vars(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
-            list(bin = ~fct_collapse(.,
-                                    "not important" = c("(3) Not very important", "(4) Not important at all"),
-                                    "important"     = c("(1) Very important", "(2) Quite important")))
+  mutate(
+    across(c(IS3G23L, IS3G23I, IS3G23H, IS3G23K, IS3G23J, IS3G23A, 
+             IS3G23C, IS3G23E, IS3G23D, IS3G23G, IS3G23F, IS3G23B),
+           ~fct_collapse(.x,
+                         "not important" = c("(3) Not very important", "(4) Not important at all"),
+                         "important"     = c("(1) Very important", "(2) Quite important")),
+           .names = "{.col}_bin")
   )
+
 ```
 
 Confirm successful cit norm mutates.
@@ -1056,12 +1167,13 @@ bin_vars <- original_vars %>%
   paste0("_bin")
 
 map2(original_vars, bin_vars, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
-```
 
+```
 
 Recode of individual-level control vars
 
 ```{r}
+
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
   mutate(female = ifelse(S_GENDER == "(0) Boy", 0, 1),   # gender
          books = case_when(                              # books in respondent's home
@@ -1110,6 +1222,7 @@ sociodem_vars_2step <- c("S_GENDER", "IS3G11", "IS3G03", "IS3G07", "IS3G09", "IS
 recoded_vars_2step  <- c("female", "books", "edexp", "ed_mom", "ed_dad", "nonnat_born", "immigrantfam", "nonnat_lang")
 
 map2(recoded_vars_2step, sociodem_vars_2step, ~ tbl_allcountries_2016_2step %>% count(!!sym(.x), !!sym(.y)))
+
 ```
 
 Read in GDP data downloaded from IMF on 8 April, 2020 from source: 
@@ -1128,7 +1241,8 @@ QQ add here code for creating 4 GDP variables:
   log_gdp_currentusd
 
 ```{r}
-# Install xls reading package
+
+# Load xls reading package
 library(readxl)
 
 # Import xlsx
@@ -1169,16 +1283,19 @@ gdp_tbl2 <- gdp_tbl2 %>%
 gdp_tbl <- left_join(gdp_tbl1, gdp_tbl2, by = "COUNTRY")
 
 gdp_tbl
+
 ```
 
 Now combine these new variables into existing dataset: `tbl_allcountries_2016_2step`.
 
 ```{r}
+
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
   mutate(COUNTRY = as.character(COUNTRY)) %>% 
   left_join(gdp_tbl, by = "COUNTRY")
 
 tbl_allcountries_2016_2step %>% head()
+
 ```
 
 
@@ -1214,33 +1331,32 @@ tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>%
          log_gdp_constant,
          gdp_currentusd,
          log_gdp_currentusd)
+
 ```
 
 
 Convert citizenship norm indicators to integer (0 = “not important”, 1 = “important”) in preparation for LG export
+
 ```{r}
-cit_norm_indicators <- vars(obey, rights, local, work, envir, vote, history, respect, news, protest, discuss, party)
 
 tbl_allcountries_2016_2step <- tbl_allcountries_2016_2step %>% 
-  mutate_at(cit_norm_indicators,
-            list( ~ case_when(
-              . == "not important" ~ 0L,
-              . == "important"     ~ 1L,
+  mutate(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~ case_when(
+              .x == "not important" ~ 0L,
+              .x == "important"     ~ 1L,
               TRUE~NA_integer_
             ))
   ) %>% 
-  mutate_at(vars(ICCS_year), as.integer) %>% 
-  mutate(COUNTRY = as.character(COUNTRY))
+  mutate(
+    ICCS_year = as.integer(ICCS_year),
+    COUNTRY   = as.character(COUNTRY)
+  )
 
  
 tbl_allcountries_2016_2step %>% head()
-```
 
-
-View 
-
-```{r, include=FALSE}
-head(tbl_allcountries_2016_2step) %>% View
 ```
 
 
