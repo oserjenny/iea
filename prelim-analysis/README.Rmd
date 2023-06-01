@@ -1,0 +1,227 @@
+---
+title: "Preliminary Analysis"
+author: "Jenny Oser"
+date: "`r format(Sys.Date(), '%b %d, %Y')`"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+
+```
+
+Read in data prepped in the `clean-data` directory.
+
+```{r}
+
+tbl <- read_delim("../clean-data/output/tbl_all_countries_all_waves.dat", delim = ",")
+
+```
+
+## Tables:
+
+Means of citizenship norm indicators by country and year.
+
+```{r}
+
+# count and percent of responses to "obey" grouped by year
+means <- tbl %>%
+  group_by(COUNTRY, ICCS_year) %>% 
+  summarize(
+    across(
+      c(obey, rights, local, work, envir, vote, history, 
+        respect, news, protest, discuss, party), 
+      ~round(mean(.x, na.rm = TRUE), 3)
+    ),
+    .groups = "drop"
+  )
+
+means %>% 
+  knitr::kable()
+
+```
+
+Count and percentage of missing values for each indicator by country and year.
+
+```{r}
+
+missing <- tbl %>% 
+  group_by(COUNTRY, ICCS_year) %>% 
+  summarize(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~paste0(sum(is.na(.x)), " (", (round(sum(is.na(.x)) / length(.) * 100, 2)), "%)")),
+    .groups = "drop"
+  )
+
+missing %>% 
+  knitr::kable()
+
+```
+
+Write to excel: cit noms means and missings tables.
+
+```{r, eval = F}
+
+writexl::write_xlsx(list(means = means, missing = missing), "output/citizenship-norm-indicator-tables.xlsx")
+
+```
+
+
+## Figures:
+
+#### Means for twelve citizenship norm indicators for only the 14 countries that are included in all three waves of the survey.
+
+First, create the table to be used for plotting.
+
+```{r}
+
+all_wave_countries <- tbl %>%
+  count(COUNTRY, ICCS_year) %>% 
+  count(COUNTRY) %>%
+  filter(n == 3) %>% 
+  pull(COUNTRY)
+
+# table with lower and upper limits for error bars
+plot_tbl <- tbl %>% 
+  filter(COUNTRY %in% all_wave_countries) %>% 
+  group_by(ICCS_year) %>% 
+  summarize(
+    across(c(obey, rights, local, work, envir, vote, history, 
+             respect, news, protest, discuss, party),
+           ~t.test(.x) %>% 
+             broom::tidy() %>%
+             mutate(mean_ci = paste(estimate, conf.low, conf.high)) %>%
+             pull(mean_ci))) %>% 
+  gather(Indicator, value, -ICCS_year) %>% 
+  mutate(value = str_split(value, " "),
+         cols = map(value, ~ data.frame(t(.)))) %>% 
+  unnest(cols) %>% 
+  select(-value) %>% 
+  mutate(mean  = as.numeric(as.character(X1)),
+         lower = as.numeric(as.character(X2)),
+         upper = as.numeric(as.character(X3))) %>% 
+  select(-c(X1, X2, X3))
+
+plot_tbl %>% 
+  mutate(
+    across(where(is.numeric), ~round(.x, 3))
+    ) %>% 
+  knitr::kable()
+
+```
+
+Line plots:
+
+```{r line-plots-all}
+
+# line plot with year on x-axis, lines colored by indicator type
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .3) +
+  geom_line() +
+  geom_point() +
+  lims(y = c(0, 1)) +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") 
+
+#ggsave("output/mean-citizenship-norm-line-plot-by-year.png")
+
+```
+
+Black and white: add the `theme_bw()` option at the end, and change the "color" aesthetic to `lty` to give a different line type for each `Indicator`.
+
+```{r}
+
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, lty = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .3) +
+  geom_line() +
+  geom_point() +
+  lims(y = c(0, 1)) +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") +
+  theme_bw()
+
+```
+
+Alternate representation of same data: plot indicators separately and `facet_wrap()` the plots so they are all in one image. Advantage to this representation is that allows readability of confidence intervals for each individual indicator.
+
+```{r line-plots-facet-1}
+
+# line plot with year on x-axis, lines colored by indicator type
+plot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Indicator, scales = "free") +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year") +
+  theme(legend.position = "none")
+
+##ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+
+```
+
+
+Facet wrap with improved interpretability, including consistent y-axis, and re-ordering to highest mean top left
+
+```{r line-plots-facet-4}
+
+# line plot with year on x-axis, lines colored by indicator type
+barplot_tbl<- plot_tbl %>% 
+    mutate(Indicator=fct_relevel(Indicator,c("obey", "rights", "local", "work", "envir", "vote", "history", "respect", "news", "protest", "discuss", "party"))) 
+
+barplot_tbl %>% 
+  ggplot(aes(x = ICCS_year, y = mean, group = Indicator, colour = Indicator)) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5) +
+  geom_line() +
+  geom_point() +
+  facet_wrap(~Indicator, scales = "fixed") +
+  labs(x = "Year", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year", caption = paste("n =",nrow(barplot_tbl))) +
+  theme(legend.position = "none", axis.text.x = element_text(size=7)) +
+  scale_x_continuous(breaks=c(1999, 2009, 2016))
+
+#ggsave("output/mean-citizenship-norm-line-plot-by-year-facet.png")
+
+```
+
+Bar plots:
+
+```{r}
+
+# bar plot with indicators on x-axis, lines colored by year
+plot_tbl %>% 
+  mutate(Year      = as.factor(ICCS_year),
+         Indicator = factor(Indicator, ordered = TRUE, levels = c("obey", "rights", "local", "work", "envir", "vote", "history",
+                                                                  "respect", "news", "protest", "discuss", "party"))) %>% 
+  ggplot(aes(x = Indicator, y = mean, fill = Year)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5, position = position_dodge(.9)) +
+  labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year")
+
+#ggsave("output/mean-citizenship-norm-bar-plot-by-indicator.png")
+
+```
+
+Bar plots of 14 countries in all 3 time periods, black and white:
+
+```{r}
+
+# bar plot with indicators on x-axis, lines colored by year
+plot_tbl %>% 
+  mutate(Year      = as.factor(ICCS_year),
+         Indicator = factor(Indicator, ordered = TRUE, levels = c("obey", "rights", "local", "work", "envir", "vote", "history",
+                                                                  "respect", "news", "protest", "discuss", "party"))) %>% 
+  ggplot(aes(x = Indicator, y = mean, fill = Year)) +
+  geom_bar(stat = "identity", position = position_dodge()) +
+  geom_errorbar(aes(ymin = lower, ymax = upper), width = .5, position = position_dodge(.9)) +
+  labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year, 14 countries") +
+  theme_bw() + scale_fill_grey()
+
+#ggsave("output/14cntry-mean-citizenship-norm-bar-plot-by-indicator-bw.png")
+
+```
