@@ -11,7 +11,13 @@ editor_options:
 
 knitr::opts_chunk$set(echo = TRUE)
 
+```
+
+```{r}
+
 library(tidyverse)
+
+sessionInfo()
 
 ```
 
