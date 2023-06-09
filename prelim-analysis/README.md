@@ -1,7 +1,65 @@
 Preliminary Analysis
 ================
 Jenny Oser
-May 27, 2023
+Jun 09, 2023
+
+``` r
+library(tidyverse)
+```
+
+    ## -- Attaching packages --------------------------------------- tidyverse 1.3.2 --
+    ## v ggplot2 3.4.0     v purrr   0.3.4
+    ## v tibble  3.1.8     v dplyr   1.0.9
+    ## v tidyr   1.2.0     v stringr 1.4.0
+    ## v readr   2.1.2     v forcats 0.5.1
+    ## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+    ## x dplyr::filter() masks stats::filter()
+    ## x dplyr::lag()    masks stats::lag()
+
+``` r
+sessionInfo()
+```
+
+    ## R version 4.1.3 (2022-03-10)
+    ## Platform: x86_64-w64-mingw32/x64 (64-bit)
+    ## Running under: Windows 10 x64 (build 22621)
+    ## 
+    ## Matrix products: default
+    ## 
+    ## locale:
+    ## [1] LC_COLLATE=English_United States.1252 
+    ## [2] LC_CTYPE=English_United States.1252   
+    ## [3] LC_MONETARY=English_United States.1252
+    ## [4] LC_NUMERIC=C                          
+    ## [5] LC_TIME=English_United States.1252    
+    ## 
+    ## attached base packages:
+    ## [1] stats     graphics  grDevices utils     datasets  methods   base     
+    ## 
+    ## other attached packages:
+    ## [1] forcats_0.5.1   stringr_1.4.0   dplyr_1.0.9     purrr_0.3.4    
+    ## [5] readr_2.1.2     tidyr_1.2.0     tibble_3.1.8    ggplot2_3.4.0  
+    ## [9] tidyverse_1.3.2
+    ## 
+    ## loaded via a namespace (and not attached):
+    ##  [1] tidyselect_1.1.2    xfun_0.32           haven_2.5.0        
+    ##  [4] gargle_1.2.0        colorspace_2.0-3    vctrs_0.5.2        
+    ##  [7] generics_0.1.3      htmltools_0.5.3     yaml_2.3.5         
+    ## [10] utf8_1.2.2          rlang_1.0.6         pillar_1.8.0       
+    ## [13] withr_2.5.0         glue_1.6.2          DBI_1.1.3          
+    ## [16] dbplyr_2.2.1        modelr_0.1.8        readxl_1.4.0       
+    ## [19] lifecycle_1.0.3     munsell_0.5.0       gtable_0.3.0       
+    ## [22] cellranger_1.1.0    rvest_1.0.2         evaluate_0.16      
+    ## [25] knitr_1.39          tzdb_0.3.0          fastmap_1.1.0      
+    ## [28] fansi_1.0.3         broom_1.0.0         scales_1.2.0       
+    ## [31] backports_1.4.1     googlesheets4_1.0.1 jsonlite_1.8.0     
+    ## [34] fs_1.5.2            hms_1.1.1           digest_0.6.29      
+    ## [37] stringi_1.7.6       grid_4.1.3          cli_3.3.0          
+    ## [40] tools_4.1.3         magrittr_2.0.3      crayon_1.5.1       
+    ## [43] pkgconfig_2.0.3     ellipsis_0.3.2      xml2_1.3.3         
+    ## [46] reprex_2.0.1        googledrive_2.0.0   lubridate_1.8.0    
+    ## [49] assertthat_0.2.1    rmarkdown_2.14      httr_1.4.3         
+    ## [52] rstudioapi_0.13     R6_2.5.1            compiler_4.1.3
 
 Read in data prepped in the `clean-data` directory.
 
@@ -362,7 +420,7 @@ plot_tbl %>%
   theme_bw()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 Alternate representation of same data: plot indicators separately and
 `facet_wrap()` the plots so they are all in one image. Advantage to this
@@ -426,7 +484,7 @@ plot_tbl %>%
   labs(x = "Indicator", y = "Mean", title = "Mean Citizenship Norm Indicators By Survey Year")
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 #ggsave("output/mean-citizenship-norm-bar-plot-by-indicator.png")
@@ -447,7 +505,7 @@ plot_tbl %>%
   theme_bw() + scale_fill_grey()
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 #ggsave("output/14cntry-mean-citizenship-norm-bar-plot-by-indicator-bw.png")
